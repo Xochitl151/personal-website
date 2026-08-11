@@ -8,6 +8,11 @@ tags: [数据分析, Python, 可视化, 电商]
 kind: independent
 featured: true
 order: 5
+externalLinks:
+  - label: 仓库汇总表（电商漏斗）
+    href: https://github.com/Xochitl151/personal-website/tree/main/data/02-%E7%94%B5%E5%95%86%E6%BC%8F%E6%96%97
+  - label: UCI 原始数据集
+    href: https://archive.ics.uci.edu/dataset/468/online+shoppers+purchasing+intention+dataset
 metrics:
   - label: 分析链路
     value: 4 步漏斗
@@ -59,8 +64,8 @@ disclaimer: 基于 UCI 公开数据集的个人练习，与实习及在招公司
 
 ## 数据
 
-- 汇总表见仓库电商漏斗目录  
-- 原始表：UCI Online Shoppers Purchasing Intention Dataset  
+- [汇总表（仓库 `data/02-电商漏斗`）](https://github.com/Xochitl151/personal-website/tree/main/data/02-%E7%94%B5%E5%95%86%E6%BC%8F%E6%96%97)  
+- [原始表：UCI Online Shoppers Purchasing Intention Dataset](https://archive.ics.uci.edu/dataset/468/online+shoppers+purchasing+intention+dataset)  
 
 ## 局限
 

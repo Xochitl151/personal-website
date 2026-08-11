@@ -64,26 +64,11 @@ const defaultInsight = defaultChannel ? getFunnelInsight(defaultChannel) : '';
   const insight = root?.querySelector('[data-funnel-insight]');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function rowHtml(row, i) {
-    return `
-      <div class="funnel__row" style="--i: ${i}">
-        <span class="funnel__label">${row.step}</span>
-        <div class="funnel__track">
-          <div class="funnel__bar" data-pct="${row.pct}" style="--target: ${row.pct}%"></div>
-        </div>
-        <span class="funnel__value">
-          ${row.sessions.toLocaleString('zh-CN')}
-          <small>${row.pct}%</small>
-        </span>
-      </div>`;
-  }
-
+  /** 就地更新节点，避免 innerHTML 丢掉 Astro scoped 样式导致绿条消失 */
   function playBars() {
     if (!bars) return;
-    const barEls = bars.querySelectorAll('.funnel__bar');
-    barEls.forEach((bar) => {
-      bar.classList.remove('is-grown');
-    });
+    const barEls = [...bars.querySelectorAll('.funnel__bar')];
+    barEls.forEach((bar) => bar.classList.remove('is-grown'));
     if (reduceMotion) {
       barEls.forEach((bar) => bar.classList.add('is-grown'));
       return;
@@ -96,9 +81,29 @@ const defaultInsight = defaultChannel ? getFunnelInsight(defaultChannel) : '';
 
   function render(id) {
     const rows = funnelData[id] ?? [];
-    if (bars) {
-      bars.innerHTML = rows.map((row, i) => rowHtml(row, i)).join('');
-    }
+    const rowEls = bars ? [...bars.querySelectorAll('.funnel__row')] : [];
+
+    rows.forEach((row, i) => {
+      const el = rowEls[i];
+      if (!el) return;
+      el.style.setProperty('--i', String(i));
+      const label = el.querySelector('.funnel__label');
+      const bar = el.querySelector('.funnel__bar');
+      const value = el.querySelector('.funnel__value');
+      if (label) label.textContent = row.step;
+      if (bar) {
+        bar.dataset.pct = String(row.pct);
+        bar.style.setProperty('--target', `${row.pct}%`);
+      }
+      if (value) {
+        value.textContent = '';
+        value.append(document.createTextNode(row.sessions.toLocaleString('zh-CN')));
+        const small = document.createElement('small');
+        small.textContent = `${row.pct}%`;
+        value.append(small);
+      }
+    });
+
     if (insight) insight.textContent = funnelInsights[id] ?? '';
     playBars();
   }
