@@ -178,12 +178,13 @@ const defaultInsight = defaultChannel ? getFunnelInsight(defaultChannel) : '';
     background: var(--color-bg);
   }
 
-  .funnel {
+  /* :global：渠道切换后节点仍吃到样式（避免 scoped 丢绿条） */
+  .demo :global(.funnel) {
     display: grid;
     gap: 0.65rem;
   }
 
-  .funnel__row {
+  .demo :global(.funnel__row) {
     display: grid;
     grid-template-columns: 6.5rem 1fr auto;
     align-items: center;
@@ -194,34 +195,35 @@ const defaultInsight = defaultChannel ? getFunnelInsight(defaultChannel) : '';
     animation-delay: calc(var(--i, 0) * 0.07s);
   }
 
-  .funnel__label {
+  .demo :global(.funnel__label) {
     font-size: 0.8rem;
     color: var(--color-muted);
   }
 
-  .funnel__track {
+  .demo :global(.funnel__track) {
     height: 0.7rem;
     background: var(--color-bg);
     border-radius: 999px;
     overflow: hidden;
   }
 
-  .funnel__bar {
+  .demo :global(.funnel__bar) {
     height: 100%;
-    width: 0%;
+    width: var(--target, 0%);
     background: linear-gradient(90deg, #5eead4, var(--color-accent));
     border-radius: 999px;
+    transform: scaleX(0);
     transform-origin: left center;
     box-shadow: 0 0 12px rgb(45 212 191 / 25%);
-  }
-
-  .funnel__bar.is-grown {
-    width: var(--target);
-    transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
     transition-delay: calc(var(--i, 0) * 0.07s + 0.05s);
   }
 
-  .funnel__value {
+  .demo :global(.funnel__bar.is-grown) {
+    transform: scaleX(1);
+  }
+
+  .demo :global(.funnel__value) {
     font-size: 0.85rem;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
@@ -229,7 +231,7 @@ const defaultInsight = defaultChannel ? getFunnelInsight(defaultChannel) : '';
     min-width: 5rem;
   }
 
-  .funnel__value small {
+  .demo :global(.funnel__value small) {
     display: block;
     font-weight: 500;
     color: var(--color-muted);
@@ -252,27 +254,27 @@ const defaultInsight = defaultChannel ? getFunnelInsight(defaultChannel) : '';
   }
 
   @media (max-width: 520px) {
-    .funnel__row {
+    .demo :global(.funnel__row) {
       grid-template-columns: 1fr;
       gap: 0.25rem;
     }
 
-    .funnel__value {
+    .demo :global(.funnel__value) {
       text-align: left;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .funnel__row {
+    .demo :global(.funnel__row) {
       opacity: 1;
       transform: none;
       animation: none;
     }
 
-    .funnel__bar,
-    .funnel__bar.is-grown {
+    .demo :global(.funnel__bar),
+    .demo :global(.funnel__bar.is-grown) {
       transition: none;
-      width: var(--target);
+      transform: scaleX(1);
     }
   }
 </style>
