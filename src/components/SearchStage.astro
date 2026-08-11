@@ -1,0 +1,231 @@
+---
+interface Props {
+  /** hero：首页大示意；compact：项目页/导览 */
+  size?: 'hero' | 'compact';
+  label?: string;
+  query?: string;
+  chips?: string[];
+}
+
+const {
+  size = 'hero',
+  label = '招投标搜索 · 示意',
+  query = '电子招投标',
+  chips = ['时间', '地区', '类型'],
+} = Astro.props;
+---
+
+<div class:list={['stage', size === 'compact' && 'stage--compact']} aria-hidden="true">
+  <div class="stage__chrome">
+    <span></span><span></span><span></span>
+    <em>{label}</em>
+  </div>
+  <div class="stage__search">
+    <span class="stage__cursor"></span>
+    {query}
+  </div>
+  <div class="stage__chips">
+    {chips.map((chip) => <span>{chip}</span>)}
+  </div>
+  <div class="stage__list">
+    <div class="stage__item is-live"><b></b><i></i></div>
+    <div class="stage__item"><b></b><i></i></div>
+    <div class="stage__item"><b></b><i></i></div>
+  </div>
+</div>
+
+<style>
+  .stage {
+    padding: 1rem;
+    background: rgb(255 255 255 / 82%);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgb(13 148 136 / 10%);
+    backdrop-filter: blur(6px);
+    animation: stage-in 0.7s ease both;
+  }
+
+  .stage--compact {
+    padding: 0.85rem;
+    box-shadow: 0 10px 28px rgb(13 148 136 / 8%);
+    animation: none;
+  }
+
+  .stage__chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+  }
+
+  .stage--compact .stage__chrome {
+    margin-bottom: 0.65rem;
+  }
+
+  .stage__chrome span {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: #d6d3d1;
+  }
+
+  .stage__chrome em {
+    margin-left: 0.35rem;
+    font-style: normal;
+  }
+
+  .stage__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid #99f6e4;
+    border-radius: 999px;
+    box-shadow: 0 0 0 3px rgb(13 148 136 / 8%);
+  }
+
+  .stage--compact .stage__search {
+    padding: 0.55rem 0.75rem;
+    font-size: 0.82rem;
+    margin-bottom: 0.55rem;
+  }
+
+  .stage__cursor {
+    width: 2px;
+    height: 1em;
+    background: var(--color-accent);
+    animation: blink 1s step-end infinite;
+  }
+
+  .stage__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .stage--compact .stage__chips {
+    margin-bottom: 0.55rem;
+  }
+
+  .stage__chips span {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+
+  .stage__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .stage--compact .stage__list {
+    gap: 0.4rem;
+  }
+
+  .stage__item {
+    display: grid;
+    gap: 0.35rem;
+    padding: 0.7rem 0.75rem;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    opacity: 0;
+    animation: row-in 0.5s ease forwards;
+  }
+
+  .stage--compact .stage__item {
+    padding: 0.5rem 0.6rem;
+    opacity: 1;
+    animation: none;
+  }
+
+  .stage__item:nth-child(1) {
+    animation-delay: 0.25s;
+  }
+  .stage__item:nth-child(2) {
+    animation-delay: 0.4s;
+  }
+  .stage__item:nth-child(3) {
+    animation-delay: 0.55s;
+  }
+
+  .stage__item.is-live {
+    border-color: #5eead4;
+    background: #f0fdfa;
+  }
+
+  .stage__item b,
+  .stage__item i {
+    display: block;
+    height: 0.45rem;
+    border-radius: 4px;
+    background: #d6d3d1;
+  }
+
+  .stage--compact .stage__item b,
+  .stage--compact .stage__item i {
+    height: 0.35rem;
+  }
+
+  .stage__item b {
+    width: 72%;
+  }
+
+  .stage__item i {
+    width: 48%;
+    opacity: 0.65;
+  }
+
+  .stage__item.is-live b {
+    background: linear-gradient(90deg, #14b8a6, #99f6e4);
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes stage-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes row-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stage,
+    .stage__item,
+    .stage__cursor {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>

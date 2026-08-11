@@ -1,0 +1,410 @@
+---
+interface Chart {
+  src: string;
+  alt: string;
+  label?: string;
+  proves: string;
+  limits?: string;
+  next?: string;
+}
+
+interface Props {
+  charts: Chart[];
+  awardSrc?: string;
+  awardCaption?: string;
+}
+
+const {
+  charts,
+  awardSrc,
+  awardCaption = '获奖证明',
+} = Astro.props;
+if (charts.length === 0) return null;
+
+const items = charts.map((chart, index) => ({
+  ...chart,
+  label: chart.label || chart.alt.slice(0, 10),
+  id: `chart-${index}`,
+}));
+
+const tabs = [
+  { id: 'charts', label: '分析图表' },
+  ...(awardSrc ? [{ id: 'award', label: '获奖证明' }] : []),
+];
+
+const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
+  src,
+  alt,
+  label,
+  proves,
+  limits: limits ?? '',
+  next: next ?? '',
+}));
+---
+
+<section class="demo reveal" data-demo="chart-gallery" aria-label="分析图库">
+  <div class="demo__head">
+    <h2>分析图库</h2>
+  </div>
+
+  {
+    tabs.length > 1 && (
+      <div class="tabs" role="tablist">
+        {tabs.map((tab, i) => (
+          <button
+            type="button"
+            role="tab"
+            class:list={['tabs__btn', i === 0 && 'is-active']}
+            data-tab={tab.id}
+            aria-selected={i === 0}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  <div class="tab-panel is-active" data-panel="charts" role="tabpanel">
+    <div class="reader">
+      <nav class="reader__nav" aria-label="图表目录">
+        {
+          items.map((item, index) => (
+            <button
+              type="button"
+              class:list={['reader__nav-btn', index === 0 && 'is-active']}
+              data-chart-nav={index}
+              aria-current={index === 0 ? 'true' : undefined}
+            >
+              <span class="reader__nav-n">{String(index + 1).padStart(2, '0')}</span>
+              <span class="reader__nav-label">{item.label}</span>
+            </button>
+          ))
+        }
+      </nav>
+
+      <div class="reader__stage">
+        <figure class="reader__figure">
+          <img data-chart-img src={items[0].src} alt={items[0].alt} loading="lazy" />
+        </figure>
+        <div class="reader__copy" data-chart-copy>
+          <h3 data-chart-title>{items[0].alt}</h3>
+          <p data-chart-proves>
+            <strong>说明</strong>
+            <span>{items[0].proves}</span>
+          </p>
+          <p data-chart-limits hidden={!items[0].limits}>
+            <strong>局限</strong>
+            <span>{items[0].limits}</span>
+          </p>
+          <p data-chart-next hidden={!items[0].next}>
+            <strong>下一步</strong>
+            <span>{items[0].next}</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {
+    awardSrc && (
+      <div class="tab-panel" data-panel="award" role="tabpanel" hidden>
+        <div class="award">
+          <p class="award__caption">{awardCaption}</p>
+          <figure class="award__figure">
+            <img src={awardSrc} alt={awardCaption} loading="lazy" />
+          </figure>
+        </div>
+      </div>
+    )
+  }
+</section>
+
+<script define:vars={{ chartData }}>
+  const root = document.querySelector('[data-demo="chart-gallery"]');
+  if (root) {
+    const buttons = root.querySelectorAll('.tabs [role="tab"]');
+    const panels = root.querySelectorAll('[data-panel]');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-tab');
+        buttons.forEach((b) => {
+          b.classList.toggle('is-active', b === btn);
+          b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+        });
+        panels.forEach((panel) => {
+          const active = panel.getAttribute('data-panel') === id;
+          panel.classList.toggle('is-active', active);
+          panel.toggleAttribute('hidden', !active);
+        });
+      });
+    });
+
+    const navBtns = root.querySelectorAll('[data-chart-nav]');
+    const img = root.querySelector('[data-chart-img]');
+    const title = root.querySelector('[data-chart-title]');
+    const proves = root.querySelector('[data-chart-proves] span');
+    const limitsRow = root.querySelector('[data-chart-limits]');
+    const limitsSpan = root.querySelector('[data-chart-limits] span');
+    const nextRow = root.querySelector('[data-chart-next]');
+    const nextSpan = root.querySelector('[data-chart-next] span');
+    const stage = root.querySelector('.reader__stage');
+
+    const show = (index) => {
+      const item = chartData[index];
+      if (!item || !(img instanceof HTMLImageElement)) return;
+
+      stage?.classList.add('is-switching');
+      window.setTimeout(() => {
+        img.src = item.src;
+        img.alt = item.alt;
+        if (title) title.textContent = item.alt;
+        if (proves) proves.textContent = item.proves;
+
+        if (limitsRow instanceof HTMLElement && limitsSpan) {
+          const has = Boolean(item.limits);
+          limitsRow.hidden = !has;
+          limitsSpan.textContent = item.limits;
+        }
+        if (nextRow instanceof HTMLElement && nextSpan) {
+          const has = Boolean(item.next);
+          nextRow.hidden = !has;
+          nextSpan.textContent = item.next;
+        }
+
+        navBtns.forEach((btn, i) => {
+          const on = i === index;
+          btn.classList.toggle('is-active', on);
+          if (on) btn.setAttribute('aria-current', 'true');
+          else btn.removeAttribute('aria-current');
+        });
+
+        stage?.classList.remove('is-switching');
+      }, 120);
+    };
+
+    navBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const index = Number(btn.getAttribute('data-chart-nav'));
+        if (!Number.isNaN(index)) show(index);
+      });
+    });
+  }
+</script>
+
+<style>
+  .tabs {
+    display: flex;
+    gap: 0.35rem;
+    margin-bottom: 1.15rem;
+  }
+
+  .tabs__btn {
+    padding: 0.4rem 0.85rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    background: var(--color-bg);
+    border: none;
+    border-radius: 980px;
+    cursor: pointer;
+  }
+
+  .tabs__btn.is-active {
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.is-active {
+    display: block;
+  }
+
+  .reader {
+    display: grid;
+    gap: 1.15rem;
+  }
+
+  @media (min-width: 860px) {
+    .reader {
+      grid-template-columns: 11.5rem minmax(0, 1fr);
+      gap: 1.5rem;
+      align-items: start;
+    }
+  }
+
+  .reader__nav {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    scrollbar-width: thin;
+  }
+
+  @media (min-width: 860px) {
+    .reader__nav {
+      flex-direction: column;
+      overflow: visible;
+      position: sticky;
+      top: 5.5rem;
+      padding-bottom: 0;
+    }
+  }
+
+  .reader__nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex: 0 0 auto;
+    padding: 0.55rem 0.7rem;
+    font: inherit;
+    text-align: left;
+    color: var(--color-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .reader__nav-btn:hover {
+    color: var(--color-text);
+    background: rgb(240 253 250 / 70%);
+  }
+
+  .reader__nav-btn.is-active {
+    color: #115e59;
+    background: #ecfdf5;
+    border-color: #99f6e4;
+  }
+
+  .reader__nav-n {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: inherit;
+    opacity: 0.7;
+  }
+
+  .reader__nav-label {
+    font-size: 0.88rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .reader__stage {
+    display: grid;
+    gap: 1rem;
+    transition: opacity 0.12s ease;
+  }
+
+  .reader__stage.is-switching {
+    opacity: 0.35;
+  }
+
+  .reader__figure {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    min-height: 16rem;
+    padding: 1.25rem;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 0%, rgb(45 212 191 / 14%), transparent 62%),
+      linear-gradient(180deg, #fafaf8 0%, #f3f4f2 100%);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+  }
+
+  .reader__figure img {
+    width: auto;
+    max-width: 100%;
+    max-height: min(24rem, 52vh);
+    object-fit: contain;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgb(28 25 23 / 8%);
+    cursor: zoom-in;
+  }
+
+  .reader__copy {
+    display: grid;
+    gap: 0.5rem;
+    padding: 0 0.15rem;
+  }
+
+  .reader__copy h3 {
+    margin: 0 0 0.15rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+  }
+
+  .reader__copy p {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+  }
+
+  .reader__copy strong {
+    display: inline-block;
+    margin-right: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-accent);
+  }
+
+  .award {
+    display: grid;
+    gap: 0.85rem;
+    max-width: 32rem;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .award__caption {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+
+  .award__figure {
+    margin: 0;
+    padding: 1.1rem;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 0%, rgb(45 212 191 / 14%), transparent 62%),
+      #f7f8f6;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+  }
+
+  .award__figure img {
+    width: auto;
+    max-width: 100%;
+    max-height: min(20rem, 46vh);
+    margin-inline: auto;
+    object-fit: contain;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 10px 28px rgb(28 25 23 / 8%);
+    cursor: zoom-in;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reader__nav-btn,
+    .reader__stage {
+      transition: none;
+    }
+  }
+</style>

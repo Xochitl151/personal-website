@@ -1,0 +1,45 @@
+---
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<div class="takeaway reveal">
+  <span class="takeaway__label">结论</span>
+  <p class="takeaway__text">{text}</p>
+</div>
+
+<style>
+  .takeaway {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding: 1.15rem 1.25rem;
+    background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 70%);
+    border: 1px solid #99f6e4;
+    border-radius: var(--radius);
+  }
+
+  .takeaway__label {
+    flex-shrink: 0;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #0f766e;
+    background: #ccfbf1;
+    border-radius: 6px;
+  }
+
+  .takeaway__text {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.55;
+    color: var(--color-text);
+  }
+</style>

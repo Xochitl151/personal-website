@@ -1,0 +1,311 @@
+---
+import AnalysisBoard from '../AnalysisBoard.astro';
+import { getUserPackageSummary, getUserServiceSummary } from '../../lib/demo-data';
+
+const packages = getUserPackageSummary();
+const services = getUserServiceSummary();
+const maxPkg = Math.max(...packages.map((p) => p.total), 1);
+const avgStay =
+  packages.length > 0
+    ? Math.round((packages.reduce((s, p) => s + p.openRate, 0) / packages.length) * 10) / 10
+    : 0;
+---
+
+<section class="demo reveal" data-demo="user" aria-label="电信客户套餐与在网洞察">
+  <div class="demo__head">
+    <h2>套餐合同与在网率</h2>
+    <p class="demo__hint">公开数据 IBM Telco Customer Churn（7043 行）· 在网率低于均值标黄</p>
+  </div>
+
+  <div class="demo__board">
+    <AnalysisBoard size="compact" label="用户结构 · 看板示意" variant="keywords" />
+  </div>
+
+  <div class="demo__controls">
+    <label>
+      <span>视图</span>
+      <select data-user-view>
+        <option value="package">按套餐合同</option>
+        <option value="service">按互联网业务</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="kw-table-wrap" data-user-panel="package">
+    <table class="kw-table">
+      <thead>
+        <tr>
+          <th>套餐合同</th>
+          <th>用户数</th>
+          <th>在网</th>
+          <th>在网率</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          packages.map((row, i) => (
+            <tr class:list={[row.openRate < avgStay && 'is-low']} style={`--i: ${i}`}>
+              <td>{row.packageType}</td>
+              <td>
+                <span class="kw-cell">
+                  <span
+                    class="kw-spark"
+                    style={`--spark: ${(row.total / maxPkg) * 100}%`}
+                    aria-hidden="true"
+                  />
+                  {row.total.toLocaleString('zh-CN')}
+                </span>
+              </td>
+              <td>{row.opened.toLocaleString('zh-CN')}</td>
+              <td>
+                <span class="kw-ctr">
+                  <span
+                    class="kw-ctr-bar"
+                    style={`--ctr: ${Math.min(row.openRate, 100)}%`}
+                    aria-hidden="true"
+                  />
+                  {row.openRate}%
+                </span>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="kw-table-wrap is-hidden" data-user-panel="service">
+    <table class="kw-table">
+      <thead>
+        <tr>
+          <th>互联网业务</th>
+          <th>用户数</th>
+          <th>在网</th>
+          <th>在网率</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          services.map((row, i) => {
+            const maxSvc = Math.max(...services.map((r) => r.users), 1);
+            return (
+              <tr class:list={[row.activeRate < avgStay && 'is-low']} style={`--i: ${i}`}>
+                <td>{row.serviceType}</td>
+                <td>
+                  <span class="kw-cell">
+                    <span
+                      class="kw-spark"
+                      style={`--spark: ${(row.users / maxSvc) * 100}%`}
+                      aria-hidden="true"
+                    />
+                    {row.users.toLocaleString('zh-CN')}
+                  </span>
+                </td>
+                <td>{row.active.toLocaleString('zh-CN')}</td>
+                <td>
+                  <span class="kw-ctr">
+                    <span
+                      class="kw-ctr-bar"
+                      style={`--ctr: ${Math.min(row.activeRate, 100)}%`}
+                      aria-hidden="true"
+                    />
+                    {row.activeRate}%
+                  </span>
+                </td>
+              </tr>
+            );
+          })
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="demo__insight" data-user-insight>
+    各套餐在网率均值约 {avgStay}%。低于均值的合同类型标黄（公开集上月付流失更高，属观察性结论）。
+  </p>
+</section>
+
+<script define:vars={{ avgStay }}>
+  const root = document.querySelector('[data-demo="user"]');
+  const select = root?.querySelector('[data-user-view]');
+  const insight = root?.querySelector('[data-user-insight]');
+  const panels = {
+    package: root?.querySelector('[data-user-panel="package"]'),
+    service: root?.querySelector('[data-user-panel="service"]'),
+  };
+
+  select?.addEventListener('change', () => {
+    const view = select.value;
+    Object.entries(panels).forEach(([key, el]) => {
+      el?.classList.toggle('is-hidden', key !== view);
+    });
+    if (insight) {
+      insight.textContent =
+        view === 'package'
+          ? `各套餐在网率均值约 ${avgStay}%。低于均值的合同类型标黄（公开集上月付流失更高，属观察性结论）。`
+          : `按互联网业务类型看用户规模与在网率；公开集无中国地区字段，地区结构以实习内网为准。`;
+    }
+  });
+</script>
+
+<style>
+  .demo {
+    margin-bottom: 2.5rem;
+    padding: 1.35rem;
+    background: var(--color-surface);
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .demo__head h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    border: none;
+    padding: 0;
+  }
+
+  .demo__hint {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .demo__board {
+    margin-bottom: 1.15rem;
+  }
+
+  .demo__controls {
+    margin-bottom: 1rem;
+  }
+
+  .demo__controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+
+  .demo__controls select {
+    min-width: 10rem;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg);
+  }
+
+  .kw-table-wrap {
+    overflow-x: auto;
+  }
+
+  .kw-table-wrap.is-hidden {
+    display: none;
+  }
+
+  .kw-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .kw-table th,
+  .kw-table td {
+    padding: 0.55rem 0.65rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .kw-table th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+
+  .kw-table tbody tr {
+    opacity: 0;
+    animation: row-in 0.35s ease forwards;
+    animation-delay: calc(var(--i, 0) * 0.04s);
+  }
+
+  .kw-table td:nth-child(n + 2) {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kw-table tr.is-low td:last-child {
+    color: #c47800;
+    font-weight: 600;
+  }
+
+  .kw-cell,
+  .kw-ctr {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .kw-spark,
+  .kw-ctr-bar {
+    display: inline-block;
+    height: 0.35rem;
+    border-radius: 999px;
+    vertical-align: middle;
+  }
+
+  .kw-spark {
+    width: 2.75rem;
+    background: linear-gradient(
+      90deg,
+      #99f6e4 0%,
+      #14b8a6 var(--spark),
+      #e7e5e4 var(--spark)
+    );
+  }
+
+  .kw-ctr-bar {
+    width: 2.4rem;
+    background: linear-gradient(
+      90deg,
+      #5eead4 0%,
+      var(--color-accent) var(--ctr),
+      #e7e5e4 var(--ctr)
+    );
+  }
+
+  .kw-table tr.is-low .kw-ctr-bar {
+    background: linear-gradient(
+      90deg,
+      #fbbf24 0%,
+      #c47800 var(--ctr),
+      #e7e5e4 var(--ctr)
+    );
+  }
+
+  .demo__insight {
+    margin: 1rem 0 0;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.875rem;
+    background: #f0fdfa;
+    border-radius: 8px;
+  }
+
+  @keyframes row-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kw-table tbody tr {
+      opacity: 1;
+      animation: none;
+    }
+  }
+</style>

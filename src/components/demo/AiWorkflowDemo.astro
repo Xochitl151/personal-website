@@ -1,0 +1,184 @@
+---
+const steps = [
+  {
+    title: '需求对齐',
+    ai: '整理会议纪要、列出字段清单草稿',
+    me: '确认业务口径：搜什么、筛什么、列表必须有哪些列',
+  },
+  {
+    title: 'AI 辅助开发',
+    ai: '生成页面骨架、联调样例、改常见报错',
+    me: '审查逻辑、改命名与边界、接真实接口/数据',
+  },
+  {
+    title: '验收清单',
+    ai: '可生成测试用例草稿',
+    me: '过主流程 + 空态/筛空/权限；拦住「看起来能跑」的假完成',
+  },
+  {
+    title: '上线交付',
+    ai: '辅助写部署说明与变更记录',
+    me: '配合发布、确认关键路径可用；交代后续维护归属',
+  },
+];
+---
+
+<section class="demo reveal" data-demo="ai-flow" aria-label="AI 交付链路">
+  <div class="demo__head">
+    <h2>AI 交付链路</h2>
+    <p class="demo__hint">各步骤中 AI 与人工的职责分工</p>
+  </div>
+
+  <ol class="flow" role="list">
+    {
+      steps.map((step, i) => (
+        <li>
+          <button
+            type="button"
+            class:list={['flow__step', i === 0 && 'is-active']}
+            data-flow-step={i}
+            aria-expanded={i === 0 ? 'true' : 'false'}
+          >
+            <span class="flow__num">{i + 1}</span>
+            <span class="flow__title">{step.title}</span>
+          </button>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="flow__detail" data-flow-detail>
+    {
+      steps.map((step, i) => (
+        <div class:list={['flow__card', i === 0 && 'is-active']} data-flow-card={i} hidden={i !== 0}>
+          <div class="flow__cols">
+            <div>
+              <p class="flow__label">AI</p>
+              <p>{step.ai}</p>
+            </div>
+            <div>
+              <p class="flow__label">我</p>
+              <p>{step.me}</p>
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector('[data-demo="ai-flow"]');
+  if (root) {
+    const buttons = root.querySelectorAll('[data-flow-step]');
+    const cards = root.querySelectorAll('[data-flow-card]');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const i = btn.getAttribute('data-flow-step');
+        buttons.forEach((b) => {
+          const on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-expanded', on ? 'true' : 'false');
+        });
+        cards.forEach((card) => {
+          const on = card.getAttribute('data-flow-card') === i;
+          card.classList.toggle('is-active', on);
+          card.toggleAttribute('hidden', !on);
+        });
+      });
+    });
+  }
+</script>
+
+<style>
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin: 0 0 1rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .flow {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .flow__step {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+    width: 100%;
+    min-height: 4.5rem;
+    padding: 0.75rem;
+    font: inherit;
+    text-align: left;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .flow__step:hover,
+  .flow__step.is-active {
+    background: var(--color-accent-soft);
+    box-shadow: inset 0 0 0 1.5px var(--color-accent);
+  }
+
+  .flow__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--color-accent);
+    border-radius: 999px;
+  }
+
+  .flow__title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .flow__card {
+    padding: 1rem;
+    background: var(--color-bg);
+    border-radius: 12px;
+  }
+
+  .flow__cols {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 560px) {
+    .flow__cols {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .flow__label {
+    margin: 0 0 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-accent);
+  }
+
+  .flow__cols p:last-child {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+</style>

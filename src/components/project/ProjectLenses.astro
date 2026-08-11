@@ -1,0 +1,147 @@
+---
+interface Lens {
+  id: 'data' | 'ai';
+  label: string;
+  bullets: string[];
+}
+
+interface Props {
+  lenses: Lens[];
+}
+
+const { lenses } = Astro.props;
+if (lenses.length === 0) return null;
+---
+
+<section class="lenses reveal" data-lenses aria-label="岗位视角">
+  <div class="lenses__head">
+    <h2>阅读视角</h2>
+    <p class="lenses__hint">同一案例，可从两种工作视角阅读重点</p>
+  </div>
+
+  <div class="lenses__tabs" role="tablist">
+    {
+      lenses.map((lens, i) => (
+        <button
+          type="button"
+          role="tab"
+          class:list={['lenses__btn', i === 0 && 'is-active']}
+          data-lens={lens.id}
+          aria-selected={i === 0}
+        >
+          {lens.label}
+        </button>
+      ))
+    }
+  </div>
+
+  {
+    lenses.map((lens, i) => (
+      <div
+        class:list={['lenses__panel', i === 0 && 'is-active']}
+        data-lens-panel={lens.id}
+        role="tabpanel"
+        hidden={i !== 0}
+      >
+        <ul>
+          {lens.bullets.map((b) => (
+            <li>{b}</li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</section>
+
+<script>
+  const root = document.querySelector('[data-lenses]');
+  if (root) {
+    const buttons = root.querySelectorAll('[role="tab"]');
+    const panels = root.querySelectorAll('[data-lens-panel]');
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-lens');
+        buttons.forEach((b) => {
+          b.classList.toggle('is-active', b === btn);
+          b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
+        });
+        panels.forEach((panel) => {
+          const active = panel.getAttribute('data-lens-panel') === id;
+          panel.classList.toggle('is-active', active);
+          panel.toggleAttribute('hidden', !active);
+        });
+      });
+    });
+  }
+</script>
+
+<style>
+  .lenses {
+    margin-bottom: 1.75rem;
+    padding: 1.2rem 1.25rem;
+    background: var(--color-surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .lenses__head h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.05rem;
+    border: none;
+    padding: 0;
+  }
+
+  .lenses__hint {
+    margin: 0 0 0.85rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .lenses__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .lenses__btn {
+    padding: 0.4rem 0.85rem;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    background: var(--color-bg);
+    border: none;
+    border-radius: 980px;
+    cursor: pointer;
+  }
+
+  .lenses__btn.is-active {
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .lenses__panel {
+    display: none;
+  }
+
+  .lenses__panel.is-active {
+    display: block;
+  }
+
+  .lenses__panel ul {
+    margin: 0;
+    padding-left: 1.15rem;
+  }
+
+  .lenses__panel li {
+    margin-bottom: 0.4rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .lenses__panel li:last-child {
+    margin-bottom: 0;
+  }
+</style>

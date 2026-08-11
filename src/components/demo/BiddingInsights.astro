@@ -1,0 +1,287 @@
+---
+import AnalysisBoard from '../AnalysisBoard.astro';
+import { getBiddingChannels, getBiddingKeywords } from '../../lib/demo-data';
+
+const channels = ['全部', ...getBiddingChannels()];
+const keywords = getBiddingKeywords();
+const avgCtr =
+  keywords.length > 0
+    ? Math.round((keywords.reduce((s, k) => s + k.ctr, 0) / keywords.length) * 10) / 10
+    : 0;
+const maxSearch = Math.max(...keywords.map((k) => k.search), 1);
+---
+
+<section class="demo reveal" data-demo="bidding" aria-label="关键词搜索洞察">
+  <div class="demo__head">
+    <h2>关键词 Top 10</h2>
+    <p class="demo__hint">练习数据 · 低于均值的 CTR 标黄</p>
+  </div>
+
+  <div class="demo__board">
+    <AnalysisBoard
+      size="compact"
+      label="关键词分析 · 看板示意"
+      variant="keywords"
+    />
+  </div>
+
+  <div class="demo__controls">
+    <label>
+      <span>渠道</span>
+      <select data-bidding-channel>
+        {channels.map((channel) => (
+          <option value={channel}>{channel}</option>
+        ))}
+      </select>
+    </label>
+  </div>
+
+  <div class="kw-table-wrap">
+    <table class="kw-table">
+      <thead>
+        <tr>
+          <th>关键词</th>
+          <th>搜索量</th>
+          <th>点击</th>
+          <th>CTR</th>
+        </tr>
+      </thead>
+      <tbody data-bidding-rows>
+        {
+          keywords.map((row, i) => (
+            <tr
+              data-ctr={row.ctr}
+              class:list={[row.ctr < avgCtr && 'is-low']}
+              style={`--i: ${i}`}
+            >
+              <td>{row.keyword}</td>
+              <td>
+                <span class="kw-cell">
+                  <span
+                    class="kw-spark"
+                    style={`--spark: ${(row.search / maxSearch) * 100}%`}
+                    aria-hidden="true"
+                  />
+                  {row.search.toLocaleString('zh-CN')}
+                </span>
+              </td>
+              <td>{row.clicks.toLocaleString('zh-CN')}</td>
+              <td>
+                <span class="kw-ctr">
+                  <span
+                    class="kw-ctr-bar"
+                    style={`--ctr: ${Math.min(row.ctr, 100)}%`}
+                    aria-hidden="true"
+                  />
+                  {row.ctr}%
+                </span>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="demo__insight" data-bidding-insight>
+    CTR 均值约 {avgCtr}%。低于均值的词标黄，优先排查摘要与排序。
+  </p>
+</section>
+
+<script define:vars={{ channelData: Object.fromEntries(channels.map((c) => [c, getBiddingKeywords(c === '全部' ? undefined : c)])), avgCtr }}>
+  const root = document.querySelector('[data-demo="bidding"]');
+  const select = root?.querySelector('[data-bidding-channel]');
+  const tbody = root?.querySelector('[data-bidding-rows]');
+  const insight = root?.querySelector('[data-bidding-insight]');
+
+  function renderRows(rows) {
+    const localAvg = rows.length ? rows.reduce((s, k) => s + k.ctr, 0) / rows.length : avgCtr;
+    const maxSearch = Math.max(...rows.map((k) => k.search), 1);
+    tbody.innerHTML = rows
+      .map(
+        (row, i) => `
+      <tr class="${row.ctr < localAvg ? 'is-low' : ''}" style="--i: ${i}">
+        <td>${row.keyword}</td>
+        <td>
+          <span class="kw-cell">
+            <span class="kw-spark" style="--spark: ${(row.search / maxSearch) * 100}%" aria-hidden="true"></span>
+            ${row.search.toLocaleString('zh-CN')}
+          </span>
+        </td>
+        <td>${row.clicks.toLocaleString('zh-CN')}</td>
+        <td>
+          <span class="kw-ctr">
+            <span class="kw-ctr-bar" style="--ctr: ${Math.min(row.ctr, 100)}%" aria-hidden="true"></span>
+            ${row.ctr}%
+          </span>
+        </td>
+      </tr>`,
+      )
+      .join('');
+    if (insight) {
+      insight.textContent = `CTR 均值约 ${Math.round(localAvg * 10) / 10}%。低于均值的词标黄，优先排查摘要与排序。`;
+    }
+  }
+
+  select?.addEventListener('change', () => {
+    renderRows(channelData[select.value] ?? []);
+  });
+</script>
+
+<style>
+  .demo {
+    margin-bottom: 2.5rem;
+    padding: 1.35rem;
+    background: var(--color-surface);
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .demo__head h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    border: none;
+    padding: 0;
+  }
+
+  .demo__hint {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .demo__board {
+    margin-bottom: 1.15rem;
+  }
+
+  .demo__controls {
+    margin-bottom: 1rem;
+  }
+
+  .demo__controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+
+  .demo__controls select {
+    min-width: 10rem;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg);
+  }
+
+  .kw-table-wrap {
+    overflow-x: auto;
+  }
+
+  .kw-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .kw-table th,
+  .kw-table td {
+    padding: 0.55rem 0.65rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .kw-table th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+
+  .kw-table tbody tr {
+    opacity: 0;
+    animation: row-in 0.35s ease forwards;
+    animation-delay: calc(var(--i, 0) * 0.04s);
+  }
+
+  .kw-table td:nth-child(n + 2) {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kw-table tr.is-low td:last-child {
+    color: #c47800;
+    font-weight: 600;
+  }
+
+  .kw-cell,
+  .kw-ctr {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .kw-spark,
+  .kw-ctr-bar {
+    display: inline-block;
+    height: 0.35rem;
+    border-radius: 999px;
+    vertical-align: middle;
+  }
+
+  .kw-spark {
+    width: 2.75rem;
+    background: linear-gradient(
+      90deg,
+      #99f6e4 0%,
+      #14b8a6 var(--spark),
+      #e7e5e4 var(--spark)
+    );
+  }
+
+  .kw-ctr-bar {
+    width: 2.4rem;
+    background: linear-gradient(
+      90deg,
+      #5eead4 0%,
+      var(--color-accent) var(--ctr),
+      #e7e5e4 var(--ctr)
+    );
+  }
+
+  .kw-table tr.is-low .kw-ctr-bar {
+    background: linear-gradient(
+      90deg,
+      #fbbf24 0%,
+      #c47800 var(--ctr),
+      #e7e5e4 var(--ctr)
+    );
+  }
+
+  .demo__insight {
+    margin: 1rem 0 0;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.875rem;
+    background: #f0fdfa;
+    border-radius: 8px;
+  }
+
+  @keyframes row-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kw-table tbody tr {
+      opacity: 1;
+      animation: none;
+    }
+  }
+</style>

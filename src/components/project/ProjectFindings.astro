@@ -1,0 +1,84 @@
+---
+interface Finding {
+  title: string;
+  detail: string;
+  action?: string;
+}
+
+interface Props {
+  findings: Finding[];
+}
+
+const { findings } = Astro.props;
+if (findings.length === 0) return null;
+---
+
+<section class="findings reveal" aria-label="核心发现">
+  <h2 class="findings__title">核心发现</h2>
+  <ul class="findings__list">
+    {
+      findings.map((item) => (
+        <li class="finding">
+          <h3>{item.title}</h3>
+          <p>{item.detail}</p>
+          {item.action && <p class="finding__action">{item.action}</p>}
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .findings {
+    margin-bottom: 2rem;
+  }
+
+  .findings__title {
+    margin: 0 0 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    letter-spacing: -0.01em;
+    border: none;
+    padding: 0;
+  }
+
+  .findings__list {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .finding {
+    padding: 1rem 1.1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .finding h3 {
+    margin: 0 0 0.35rem;
+    font-size: 0.98rem;
+  }
+
+  .finding p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    line-height: 1.5;
+  }
+
+  .finding__action {
+    margin-top: 0.5rem !important;
+    font-size: 0.85rem !important;
+    color: var(--color-text) !important;
+  }
+
+  .finding__action::before {
+    content: '建议：';
+    color: var(--color-muted);
+  }
+</style>

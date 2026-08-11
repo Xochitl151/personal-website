@@ -1,0 +1,228 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { projectKinds } from '../lib/projects';
+import { pitches as rolePitches, site } from '../site.config';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const stops = [
+  {
+    slug: 'operator-user-analytics',
+    seconds: '约 1 分钟',
+    try: '套餐 / 地区视图切换',
+    blurb: '实习主分析：套餐、开通、地区结构；公网为练习数据，演示口径与看板。',
+  },
+  {
+    slug: 'bidding-search-engine',
+    seconds: '约 1 分钟',
+    try: '功能模块与 AI 交付链路',
+    blurb: '实习工程项目：爬虫采集 + 搜索站点开发部署（未长期正式运营）。',
+  },
+  {
+    slug: 'special-food-teddy-cup',
+    seconds: '约 1 分钟',
+    try: '分析图库与选品筛选',
+    blurb: '泰迪杯 B 题：从 PDF 说明书抽取结构数据，完成可视化与按人群/症状选品；二等奖。',
+  },
+  {
+    slug: 'ecommerce-funnel-analysis',
+    seconds: '约 1 分钟',
+    try: '按渠道切换漏斗',
+    blurb: '基于 UCI 公开数据的转化漏斗练习：找出流失环节，结论不做因果断言。',
+  },
+];
+
+const bySlug = Object.fromEntries(projects.map((p) => [p.slug, p]));
+const title = `60 秒导览 · ${site.name}`;
+---
+
+<BaseLayout title={title} description="快速浏览作品：按顺序打开案例，先看结论再看证据。">
+  <section class="tour">
+    <div class="container tour__inner">
+      <header class="tour__head">
+        <p class="tour__eyebrow">快速了解</p>
+        <h1>60 秒导览</h1>
+        <p class="lead">
+          不必通读长文。按下面顺序打开：每页先看结论与指标，再看页内证据。
+        </p>
+      </header>
+
+      <ol class="tour__list">
+        {
+          stops.map((stop, i) => {
+            const project = bySlug[stop.slug];
+            if (!project) return null;
+            const kind = projectKinds[project.data.kind];
+            return (
+              <li class="tour__card">
+                <div class="tour__index">{i + 1}</div>
+                <div class="tour__body">
+                  <div class="tour__meta">
+                    <span class:list={['tag', kind.tagClass]}>{kind.label}</span>
+                    <span class="tour__time">{stop.seconds}</span>
+                  </div>
+                  <h2>
+                    <a href={`/projects/${project.slug}`}>{project.data.title}</a>
+                  </h2>
+                  <p class="tour__ask">
+                    <strong>看点：</strong>
+                    {stop.try}
+                  </p>
+                  <p class="tour__say">{stop.blurb}</p>
+                  <a class="tour__go" href={`/projects/${project.slug}`}>
+                    打开案例 →
+                  </a>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ol>
+
+      <p class="tour__foot">
+        按方向浏览：
+        <a href={rolePitches.data.path}>{rolePitches.data.label}</a>
+        ·
+        <a href={rolePitches.ai.path}>{rolePitches.ai.label}</a>
+        ·
+        <a href="/resume">下载简历</a>
+        ·
+        <a href="/projects">全部作品</a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .tour {
+    padding-block: var(--space-section);
+    background:
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgb(45 212 191 / 14%), transparent 50%),
+      var(--color-bg);
+  }
+
+  .tour__inner {
+    max-width: 42rem;
+  }
+
+  .tour__eyebrow {
+    margin: 0 0 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .tour__head h1 {
+    margin: 0 0 0.65rem;
+  }
+
+  .lead {
+    margin: 0 0 2rem;
+    color: var(--color-muted);
+    font-size: 1.05rem;
+  }
+
+  .tour__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .tour__card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    padding: 1.15rem 1.25rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .tour__card:hover {
+    border-color: #99f6e4;
+    box-shadow: 0 10px 28px rgb(13 148 136 / 10%);
+    transform: translateY(-2px);
+  }
+
+  .tour__index {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #fff;
+    background: var(--color-accent);
+    border-radius: 999px;
+  }
+
+  .tour__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .tour__time {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+
+  .tour__body h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
+  }
+
+  .tour__body h2 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .tour__body h2 a:hover {
+    color: var(--color-accent);
+  }
+
+  .tour__ask,
+  .tour__say {
+    margin: 0 0 0.45rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .tour__say {
+    color: var(--color-muted);
+  }
+
+  .tour__go {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .tour__go:hover {
+    text-decoration: underline;
+  }
+
+  .tour__foot {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+</style>

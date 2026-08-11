@@ -1,0 +1,81 @@
+---
+/** 目录由 project-page.ts 根据正文 h2 自动生成 */
+---
+
+<nav class="project-toc" aria-label="本页目录">
+  <p class="project-toc__title">目录</p>
+  <ol class="project-toc__list" data-toc-list></ol>
+</nav>
+
+<style>
+  .project-toc {
+    position: sticky;
+    top: 5.5rem;
+    padding: 1.1rem 1rem 1.15rem;
+    background:
+      linear-gradient(180deg, rgb(240 253 250 / 70%), rgb(255 255 255 / 88%)),
+      var(--color-surface);
+    border: 1px solid rgb(153 246 228 / 55%);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(6px);
+  }
+
+  .project-toc__title {
+    margin: 0 0 0.75rem;
+    padding: 0 0.35rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .project-toc__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .project-toc__list:empty::after {
+    content: '（加载中）';
+    display: block;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .project-toc__list a {
+    display: block;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.88rem;
+    line-height: 1.35;
+    color: var(--color-muted);
+    text-decoration: none;
+    border-radius: 8px;
+    border-left: none;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .project-toc__list a:hover {
+    color: var(--color-accent);
+    background: rgb(240 253 250 / 80%);
+  }
+
+  .project-toc__list a.is-active {
+    color: #115e59;
+    font-weight: 600;
+    background: #ecfdf5;
+  }
+
+  @media (max-width: 960px) {
+    .project-toc {
+      position: static;
+      margin-bottom: 0.25rem;
+    }
+  }
+</style>

@@ -1,0 +1,421 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { pitches, site } from '../site.config';
+
+const title = `关于 · ${site.name}`;
+const metaBits = site.taglineSupport.split(' · ');
+---
+
+<BaseLayout title={title} description={`关于 ${site.name}：方向、技能与教育背景。`}>
+  <section class="about">
+    <div class="about__atmosphere" aria-hidden="true"></div>
+    <div class="about__inner">
+      <header class="about__intro">
+        <p class="about__eyebrow">简介</p>
+        <h1>关于</h1>
+        <p class="about__lead">{site.tagline}</p>
+        <ul class="about__meta">
+          {metaBits.map((bit) => <li>{bit}</li>)}
+        </ul>
+      </header>
+
+      <section class="about__block">
+        <h2>方向</h2>
+        <div class="about__rows">
+          <div class="about__row">
+            <span class="about__label">主线</span>
+            <p>数据分析、AI 产品 / 应用、数据运营</p>
+          </div>
+          <div class="about__row">
+            <span class="about__label">延伸</span>
+            <p>电商数据与用户行为分析</p>
+          </div>
+          <div class="about__row">
+            <span class="about__label">实习</span>
+            <p>
+              广东智慧广电物联网科技有限公司 · 数据分析实习生（2025.08–2025.12）。主线为用户套餐 /
+              开通 / 地区等数据整理与分析（见
+              <a href="/projects/operator-user-analytics">用户套餐分析</a>
+              ，公网为练习数据）；同期参与招投标信息采集与搜索站点建设（爬虫 + 建站，未长期正式运营）。
+            </p>
+          </div>
+        </div>
+        <p class="about__note">{site.skillsFootnote}</p>
+      </section>
+
+      <section class="about__block">
+        <h2>浏览作品</h2>
+        <div class="about__links">
+          <a class="about__link" href="/tour">
+            <span class="about__link-title">60 秒导览</span>
+            <span class="about__link-desc">按顺序快速看完四个案例</span>
+          </a>
+          <a class="about__link" href={pitches.data.path}>
+            <span class="about__link-title">{pitches.data.label}</span>
+            <span class="about__link-desc">{pitches.data.summary}</span>
+          </a>
+          <a class="about__link" href={pitches.ai.path}>
+            <span class="about__link-title">{pitches.ai.label}</span>
+            <span class="about__link-desc">{pitches.ai.summary}</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="about__block">
+        <h2>技能</h2>
+        <ul class="about__skills">
+          <li>Excel</li>
+          <li>SQL</li>
+          <li>Python</li>
+          <li>Pandas</li>
+          <li>Matplotlib</li>
+          <li>Tableau</li>
+          <li>Word / PPT</li>
+          <li>AI 辅助开发</li>
+          <li>CET-4</li>
+        </ul>
+        <p class="about__note">Excel（透视、VLOOKUP、统计分析）；Python（Pandas / Matplotlib）；报告撰写与 AI 工具辅助文档整理。</p>
+      </section>
+
+      <section class="about__block">
+        <h2>荣誉与证明</h2>
+        <p class="about__note">比赛证明见对应项目页；下列证书供核验查阅。</p>
+        <ul class="about__credentials">
+          <li>
+            <div>
+              <strong>认证杯</strong>
+              <span>2023 第十六届数学中国数学建模网络挑战赛 · 全国第一阶段二等奖</span>
+            </div>
+            <a href="/files/credentials/certification-cup-2023-second-prize.pdf" target="_blank" rel="noopener">
+              奖状 PDF
+            </a>
+          </li>
+          <li>
+            <div>
+              <strong>大学英语四级（CET-4）</strong>
+            </div>
+            <a href="/files/credentials/cet4.pdf" target="_blank" rel="noopener">证书 PDF</a>
+          </li>
+          <li>
+            <div>
+              <strong>泰迪杯 · 数据分析挑战赛</strong>
+              <span>第七届 B 题特医食品 · 二等奖</span>
+            </div>
+            <span class="about__credential-links">
+              <a href="/projects/special-food-teddy-cup">项目页</a>
+              <a href="/images/projects/special-food/teddy-cup-award-b.jpg" target="_blank" rel="noopener">获奖证明</a>
+            </span>
+          </li>
+          <li>
+            <div>
+              <strong>校级三等奖学金</strong>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+      <section class="about__block about__block--split">
+        <div>
+          <h2>教育</h2>
+          <p class="about__edu-school">广东石油化工学院 · 本科 · 信息与计算科学</p>
+          <p class="about__note">2022.09–2026.06</p>
+          <p class="about__note">主修：数据库原理、Python 数据分析、数据结构与算法、线性代数、运筹学</p>
+          <p class="about__file">
+            <a href="/files/credentials/xuexin-enrollment-verification.pdf" target="_blank" rel="noopener">
+              教育部学籍在线验证报告（PDF）
+            </a>
+          </p>
+        </div>
+        <div>
+          <h2>联系</h2>
+          <p class="about__note">{site.contactNote}</p>
+          <p class="about__file">
+            <a class="btn" href="/resume">下载简历 PDF</a>
+          </p>
+        </div>
+      </section>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about {
+    position: relative;
+    overflow: hidden;
+    padding-block: var(--space-section);
+  }
+
+  .about__atmosphere {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 45% at 0% 0%, rgb(45 212 191 / 14%), transparent 55%),
+      radial-gradient(ellipse 50% 35% at 100% 10%, rgb(15 118 110 / 8%), transparent 50%);
+    pointer-events: none;
+  }
+
+  .about__inner {
+    position: relative;
+    width: min(100% - 2.5rem, 42rem);
+    margin-inline: auto;
+  }
+
+  .about__intro {
+    margin-bottom: 2.75rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .about__eyebrow {
+    margin: 0 0 0.45rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: var(--color-accent);
+  }
+
+  .about__intro h1 {
+    margin: 0 0 0.85rem;
+    letter-spacing: -0.03em;
+  }
+
+  .about__lead {
+    margin: 0 auto 1.1rem;
+    max-width: 34rem;
+    font-size: 1.12rem;
+    line-height: 1.6;
+    color: var(--color-text);
+  }
+
+  .about__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .about__meta li {
+    padding: 0.28rem 0.7rem;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+    border: 1px solid #ccfbf1;
+    border-radius: 999px;
+  }
+
+  .about__block {
+    margin-bottom: 2.5rem;
+  }
+
+  .about__block h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin: 0 0 1.1rem;
+    font-size: 1.2rem;
+    letter-spacing: -0.02em;
+  }
+
+  .about__block h2::before {
+    content: '';
+    width: 3px;
+    height: 0.95em;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #14b8a6, #0f766e);
+    flex-shrink: 0;
+  }
+
+  .about__rows {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .about__row {
+    display: grid;
+    gap: 0.35rem 1rem;
+    padding: 1rem 1.15rem;
+    background: rgb(255 255 255 / 82%);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgb(28 25 23 / 3%);
+  }
+
+  @media (min-width: 640px) {
+    .about__row {
+      grid-template-columns: 3.5rem minmax(0, 1fr);
+      align-items: start;
+    }
+  }
+
+  .about__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--color-accent);
+    padding-top: 0.15rem;
+  }
+
+  .about__row p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #44403c;
+  }
+
+  .about__note {
+    margin: 0.9rem 0 0;
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+  }
+
+  .about__links {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .about__link {
+    display: grid;
+    gap: 0.25rem;
+    padding: 1rem 1.15rem;
+    color: inherit;
+    text-decoration: none;
+    background: rgb(255 255 255 / 82%);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.15s ease;
+  }
+
+  .about__link:hover {
+    border-color: #99f6e4;
+    box-shadow: 0 8px 22px rgb(13 148 136 / 8%);
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  .about__link-title {
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .about__link-desc {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+
+  .about__skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .about__skills li {
+    padding: 0.28rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #134e4a;
+    background: #fff;
+    border: 1px solid #99f6e4;
+    border-radius: 999px;
+  }
+
+  .about__credentials {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .about__credentials li {
+    display: grid;
+    gap: 0.45rem;
+    padding: 0.95rem 1.1rem;
+    background: rgb(255 255 255 / 82%);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+  }
+
+  @media (min-width: 640px) {
+    .about__credentials li {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1rem;
+    }
+  }
+
+  .about__credentials strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-size: 0.95rem;
+  }
+
+  .about__credentials span {
+    display: block;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--color-muted);
+  }
+
+  .about__credentials a,
+  .about__credential-links a {
+    font-size: 0.88rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .about__credential-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .about__block--split {
+    display: grid;
+    gap: 1.75rem;
+    margin-bottom: 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 720px) {
+    .about__block--split {
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+    }
+  }
+
+  .about__edu-school {
+    margin: 0 0 0.35rem;
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1.45;
+  }
+
+  .about__file {
+    margin: 1rem 0 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about__link {
+      transition: none;
+    }
+
+    .about__link:hover {
+      transform: none;
+    }
+  }
+</style>

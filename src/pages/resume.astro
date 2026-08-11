@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../site.config';
+
+const title = `简历 · ${site.name}`;
+const pdfPath = '/files/resume.pdf';
+---
+
+<BaseLayout
+  title={title}
+  description={`下载 ${site.name} 的简历 PDF（招聘沟通专用）。`}
+  robots="noindex, follow"
+>
+  <section class="page">
+    <div class="container page__inner">
+      <h1>简历</h1>
+      <p class="lead">与投递版本一致。可直接下载或在浏览器中预览。</p>
+
+      <p class="notice" role="note">{site.resumeUseNotice}</p>
+
+      <div class="actions">
+        <a
+          class="btn"
+          href={pdfPath}
+          download={site.resumeDownloadName}
+          rel="nofollow noopener"
+        >
+          下载 PDF
+        </a>
+        <a class="btn btn--ghost" href={pdfPath} target="_blank" rel="nofollow noopener noreferrer">
+          浏览器中打开
+        </a>
+      </div>
+
+      <p class="muted">
+        文件路径：<code>public/files/resume.pdf</code>。更新简历时替换该文件后重新部署即可。
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--space-section);
+  }
+
+  .page__inner {
+    max-width: 36rem;
+  }
+
+  .lead {
+    color: var(--color-muted);
+  }
+
+  .notice {
+    margin: 1rem 0 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+    background: var(--color-surface);
+    border-left: 3px solid var(--color-border);
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+  }
+
+  .muted {
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+
+  code {
+    font-size: 0.85em;
+    padding: 0.1em 0.35em;
+    background: #f5f5f4;
+    border-radius: 4px;
+  }
+</style>

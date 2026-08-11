@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../site.config';
+---
+
+<BaseLayout title={`页面未找到 · ${site.name}`} description="页面不存在">
+  <section class="page">
+    <div class="container page__inner">
+      <h1>404</h1>
+      <p>这个页面不存在，或链接已变更。</p>
+      <a class="btn" href="/">回首页</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--space-section);
+    text-align: center;
+  }
+
+  .page__inner {
+    max-width: 24rem;
+    margin-inline: auto;
+  }
+
+  h1 {
+    font-size: 4rem;
+    margin: 0 0 0.5rem;
+    color: var(--color-muted);
+  }
+</style>

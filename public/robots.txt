@@ -1,0 +1,7 @@
+# 允许收录作品集页面，降低简历 PDF 被搜索引擎抓取的概率（不阻止人工下载）
+User-agent: *
+Allow: /
+Disallow: /files/resume.pdf
+Disallow: /resume
+
+Sitemap: https://example.pages.dev/sitemap-index.xml

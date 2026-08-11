@@ -1,0 +1,253 @@
+---
+---
+
+<section class="demo reveal" data-demo="product-picker" aria-label="选品筛选">
+  <div class="demo__head">
+    <h2>选品筛选</h2>
+    <p class="demo__hint">赛题脱敏样本 · 按人群类别与症状关键词过滤</p>
+  </div>
+
+  <div class="demo__controls">
+    <label>
+      <span>适用人群类别</span>
+      <select data-picker-category>
+        <option value="">全部</option>
+        <option value="特医婴配食品">特医婴配食品</option>
+        <option value="1岁以上特医食品">1 岁以上特医食品</option>
+      </select>
+    </label>
+    <label>
+      <span>症状关键词</span>
+      <input type="search" data-picker-symptom placeholder="如：过敏、吞咽、营养" />
+    </label>
+  </div>
+
+  <p class="demo__count" data-picker-count>加载中…</p>
+
+  <div class="picker-table-wrap">
+    <table class="picker-table">
+      <thead>
+        <tr>
+          <th>产品</th>
+          <th>注册证号</th>
+          <th>人群类别</th>
+          <th>症状/适用</th>
+        </tr>
+      </thead>
+      <tbody data-picker-rows />
+    </table>
+  </div>
+</section>
+
+<script>
+  type Product = {
+    company: string;
+    name: string;
+    id: string;
+    category: string;
+    symptom: string;
+    source: string;
+  };
+
+  const categorySelect = document.querySelector<HTMLSelectElement>('[data-picker-category]');
+  const symptomInput = document.querySelector<HTMLInputElement>('[data-picker-symptom]');
+  const tbody = document.querySelector('[data-picker-rows]');
+  const countEl = document.querySelector('[data-picker-count]');
+  let products: Product[] = [];
+
+  function render() {
+    if (!tbody || !countEl) return;
+
+    const category = categorySelect?.value ?? '';
+    const symptom = symptomInput?.value.trim().toLowerCase() ?? '';
+
+    const filtered = products.filter((p) => {
+      if (category && p.category !== category) return false;
+      if (symptom && !`${p.symptom}${p.name}${p.category}`.toLowerCase().includes(symptom)) return false;
+      return true;
+    });
+
+    countEl.textContent =
+      filtered.length === 0
+        ? '无匹配产品，可放宽筛选条件。'
+        : `匹配 ${filtered.length} 款产品（共 ${products.length} 条样本）。`;
+
+    tbody.innerHTML = filtered
+      .map(
+        (p) => `
+      <tr>
+        <td>
+          <strong>${p.name}</strong>
+          <small>${p.company}</small>
+        </td>
+        <td>${p.id}</td>
+        <td>${p.category}</td>
+        <td>${p.symptom}</td>
+      </tr>`,
+      )
+      .join('');
+  }
+
+  fetch('/data/special-food-products.json')
+    .then((r) => r.json())
+    .then((data: Product[]) => {
+      products = data;
+      render();
+    })
+    .catch(() => {
+      if (countEl) countEl.textContent = '样本数据加载失败。';
+    });
+
+  categorySelect?.addEventListener('change', render);
+  symptomInput?.addEventListener('input', render);
+</script>
+
+<style>
+  .demo {
+    margin-bottom: 2.5rem;
+    padding: 1.35rem;
+    background: var(--color-surface);
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .demo__head h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    border: none;
+    padding: 0;
+  }
+
+  .demo__hint {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .demo__controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .demo__controls {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1rem;
+    }
+  }
+
+  .demo__controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+
+  .demo__controls select,
+  .demo__controls input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg);
+  }
+
+  .demo__controls select:focus,
+  .demo__controls input:focus {
+    outline: none;
+    border-color: #99f6e4;
+    box-shadow: 0 0 0 3px rgb(15 118 110 / 8%);
+  }
+
+  .demo__count {
+    margin: 0 0 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .picker-table-wrap {
+    overflow-x: auto;
+  }
+
+  .picker-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .picker-table th,
+  .picker-table td {
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .picker-table th:nth-child(1),
+  .picker-table td:nth-child(1) {
+    width: 40%;
+    padding-left: 0;
+  }
+
+  .picker-table th:nth-child(2),
+  .picker-table td:nth-child(2) {
+    width: 24%;
+  }
+
+  .picker-table th:nth-child(3),
+  .picker-table td:nth-child(3) {
+    width: 18%;
+  }
+
+  .picker-table th:nth-child(4),
+  .picker-table td:nth-child(4) {
+    width: 18%;
+    padding-right: 0;
+  }
+
+  .picker-table th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  .picker-table tbody tr:hover td {
+    background: rgb(240 253 250 / 40%);
+  }
+
+  .picker-table td strong {
+    display: block;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .picker-table td small {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--color-muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .picker-table td:nth-child(2),
+  .picker-table td:nth-child(3),
+  .picker-table td:nth-child(4) {
+    white-space: nowrap;
+  }
+
+  .picker-table td:nth-child(2) {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-muted);
+  }
+</style>

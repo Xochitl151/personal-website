@@ -1,0 +1,285 @@
+---
+/**
+ * 招投标搜索 · 功能模块示意
+ * 文案可按真实模块再改 features 数组
+ */
+const features = [
+  {
+    id: 'search',
+    title: '全文检索',
+    blurb: '按关键词快速定位标讯',
+    detail:
+      '支持标题与正文检索；空结果与常见错别字有提示，避免业务同学「搜不到就放弃」。',
+  },
+  {
+    id: 'filter',
+    title: '条件筛选',
+    blurb: '地区、时间、类型组合过滤',
+    detail:
+      '多条件可叠加；筛空时给出可理解的空态，而不是空白页或报错栈。',
+  },
+  {
+    id: 'list',
+    title: '结果列表',
+    blurb: '字段对齐业务阅读习惯',
+    detail:
+      '列表列与摘要口径与业务文档一致；关键信息一眼可见，减少来回点开详情。',
+  },
+  {
+    id: 'export',
+    title: '导出 / 留痕',
+    blurb: '便于协作与后续核对',
+    detail:
+      '支持导出或操作留痕（按权限）；方便运营复盘与问题追溯，而不是只停留在页面上。',
+  },
+];
+---
+
+<section class="demo reveal" data-demo="features" aria-label="功能模块示意">
+  <div class="demo__head">
+    <h2>功能模块</h2>
+    <p class="demo__hint">检索相关模块与界面示意</p>
+  </div>
+
+  <div class="feat">
+    <div class="feat__nav" role="tablist" aria-label="功能模块">
+      {
+        features.map((f, i) => (
+          <button
+            type="button"
+            class:list={['feat__tab', i === 0 && 'is-active']}
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            data-feat-tab={f.id}
+          >
+            <span class="feat__tab-title">{f.title}</span>
+            <span class="feat__tab-blurb">{f.blurb}</span>
+          </button>
+        ))
+      }
+    </div>
+    <div class="feat__panel">
+      {
+        features.map((f, i) => (
+          <div
+            class:list={['feat__pane', i === 0 && 'is-active']}
+            role="tabpanel"
+            data-feat-pane={f.id}
+            hidden={i !== 0}
+          >
+            <h3>{f.title}</h3>
+            <p>{f.detail}</p>
+          </div>
+        ))
+      }
+      <div class="feat__mock" aria-hidden="true">
+        <div class="mock__bar">
+          <span class="mock__dot" />
+          <span class="mock__dot" />
+          <span class="mock__dot" />
+          <span class="mock__search">搜索招投标信息…</span>
+        </div>
+        <div class="mock__filters">
+          <span>地区</span>
+          <span>时间</span>
+          <span>类型</span>
+        </div>
+        <div class="mock__rows">
+          <div class="mock__row" />
+          <div class="mock__row" />
+          <div class="mock__row mock__row--dim" />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const root = document.querySelector('[data-demo="features"]');
+  if (root) {
+    const tabs = root.querySelectorAll('[data-feat-tab]');
+    const panes = root.querySelectorAll('[data-feat-pane]');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const id = tab.getAttribute('data-feat-tab');
+        tabs.forEach((t) => {
+          const on = t === tab;
+          t.classList.toggle('is-active', on);
+          t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        panes.forEach((pane) => {
+          const on = pane.getAttribute('data-feat-pane') === id;
+          pane.classList.toggle('is-active', on);
+          pane.toggleAttribute('hidden', !on);
+        });
+      });
+    });
+  }
+</script>
+
+<style>
+  .feat {
+    display: grid;
+    gap: 1rem;
+  }
+
+  @media (min-width: 720px) {
+    .feat {
+      grid-template-columns: minmax(12rem, 15rem) minmax(0, 1fr);
+      align-items: stretch;
+    }
+  }
+
+  .feat__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .feat__tab {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 0.85rem;
+    text-align: left;
+    font: inherit;
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .feat__tab:hover,
+  .feat__tab.is-active {
+    background: var(--color-accent-soft);
+    box-shadow: inset 0 0 0 1.5px var(--color-accent);
+  }
+
+  .feat__tab-title {
+    display: block;
+    font-weight: 600;
+    font-size: 0.92rem;
+  }
+
+  .feat__tab-blurb {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 0.78rem;
+    color: var(--color-muted);
+    line-height: 1.4;
+  }
+
+  .feat__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-bg);
+    border-radius: 12px;
+  }
+
+  .feat__pane h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.05rem;
+  }
+
+  .feat__pane p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--color-muted);
+  }
+
+  .feat__mock {
+    margin-top: auto;
+    padding: 0.85rem;
+    background: var(--color-surface);
+    border-radius: 12px;
+  }
+
+  .mock__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.65rem;
+    padding: 0.45rem 0.6rem;
+    background: var(--color-bg);
+    border-radius: 980px;
+  }
+
+  .mock__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: #d2d2d7;
+  }
+
+  .mock__search {
+    margin-left: 0.35rem;
+    font-size: 0.78rem;
+    color: var(--color-muted);
+  }
+
+  .mock__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.65rem;
+  }
+
+  .mock__filters span {
+    padding: 0.2rem 0.55rem;
+    font-size: 0.72rem;
+    color: var(--color-muted);
+    background: var(--color-bg);
+    border-radius: 980px;
+  }
+
+  .mock__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .mock__row {
+    height: 0.65rem;
+    border-radius: 4px;
+    background: linear-gradient(
+      90deg,
+      #ccfbf1 0%,
+      #99f6e4 35%,
+      #e7e5e4 70%,
+      #ccfbf1 100%
+    );
+    background-size: 200% 100%;
+    animation: mock-shimmer 2.2s ease-in-out infinite;
+  }
+
+  .mock__row:nth-child(2) {
+    animation-delay: 0.15s;
+    width: 88%;
+  }
+
+  .mock__row--dim {
+    opacity: 0.45;
+    width: 72%;
+    animation-delay: 0.3s;
+  }
+
+  @keyframes mock-shimmer {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mock__row {
+      animation: none;
+      background: linear-gradient(90deg, #ccfbf1, #e7e5e4 70%);
+    }
+  }
+</style>

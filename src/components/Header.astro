@@ -1,0 +1,89 @@
+---
+import { site } from '../site.config';
+
+const nav = [
+  { href: '/tour', label: '导览' },
+  { href: '/projects', label: '作品' },
+  { href: '/about', label: '关于' },
+  { href: '/resume', label: '简历' },
+];
+
+const current = Astro.url.pathname;
+---
+
+<header class="header">
+  <div class="container header__inner">
+    <a class="header__brand" href="/">{site.name}</a>
+    <nav class="header__nav" aria-label="主导航">
+      {
+        nav.map((item) => (
+          <a
+            class:list={['header__link', current.startsWith(item.href) && 'is-active']}
+            href={item.href}
+            aria-current={current.startsWith(item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(247 248 246 / 88%);
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(10px);
+  }
+
+  .header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1rem;
+  }
+
+  .header__brand {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .header__brand:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .header__nav {
+    display: flex;
+    gap: 0.25rem 1.25rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .header__link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    opacity: 1;
+    text-decoration: none;
+  }
+
+  .header__link:hover,
+  .header__link.is-active {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .header__link.is-active {
+    font-weight: 500;
+  }
+</style>

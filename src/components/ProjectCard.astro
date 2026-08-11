@@ -1,0 +1,187 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { projectKinds, splitProjectTags } from '../lib/projects';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+const { title, takeaway, kind, tags } = project.data;
+const href = `/projects/${project.slug}`;
+const kindMeta = projectKinds[kind];
+const { skills } = splitProjectTags(tags);
+const skillTags = skills.slice(0, 3);
+---
+
+<article class="card" data-card-tilt>
+  <a class="card__link" href={href}>
+    <div class="card__meta">
+      <span class:list={['tag', kindMeta.tagClass]}>{kindMeta.label}</span>
+      {skillTags.map((tag) => <span class="tag tag--skill">{tag}</span>)}
+    </div>
+    <h2 class="card__title">{title}</h2>
+    <p class="card__takeaway">{takeaway}</p>
+    <span class="card__more">查看案例</span>
+  </a>
+</article>
+
+<style>
+  .card {
+    --tilt-x: 0deg;
+    --tilt-y: 0deg;
+    height: 100%;
+    background: rgb(255 255 255 / 90%);
+    border: 1px solid var(--color-border);
+    border-radius: calc(var(--radius) + 2px);
+    box-shadow: 0 1px 2px rgb(28 25 23 / 3%), 0 10px 28px rgb(28 25 23 / 4%);
+    transform: perspective(800px) rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateY(var(--lift, 0));
+    transition:
+      border-color 0.22s ease,
+      box-shadow 0.22s ease;
+    will-change: transform;
+  }
+
+  .card:hover {
+    --lift: -3px;
+    border-color: #99f6e4;
+    box-shadow: 0 1px 2px rgb(13 148 136 / 4%), 0 16px 34px rgb(13 148 136 / 12%);
+  }
+
+  .card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.55rem 1.6rem 1.4rem;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .card__link:hover {
+    text-decoration: none;
+  }
+
+  .card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 0.9rem;
+  }
+
+  .card__title {
+    margin: 0 0 0.65rem;
+    font-size: 1.22rem;
+    font-weight: 600;
+    letter-spacing: -0.028em;
+    line-height: 1.28;
+    transition: color 0.2s ease;
+  }
+
+  .card:hover .card__title {
+    color: #115e59;
+  }
+
+  .card__takeaway {
+    flex: 1;
+    margin: 0 0 1.35rem;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: var(--color-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card__more {
+    margin-top: auto;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .card__more::after {
+    content: ' →';
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+
+  .card:hover .card__more::after {
+    transform: translateX(4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card {
+      transform: none;
+      will-change: auto;
+    }
+
+    .card:hover {
+      --lift: 0;
+    }
+
+    .card__title,
+    .card__more::after {
+      transition: none;
+    }
+
+    .card:hover .card__more::after {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const finePointer = window.matchMedia('(pointer: fine)');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function bindCardTilt(card) {
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let raf = 0;
+
+    const render = () => {
+      currentX += (targetX - currentX) * 0.16;
+      currentY += (targetY - currentY) * 0.16;
+      card.style.setProperty('--tilt-x', `${currentX.toFixed(2)}deg`);
+      card.style.setProperty('--tilt-y', `${currentY.toFixed(2)}deg`);
+
+      if (Math.abs(targetX - currentX) > 0.02 || Math.abs(targetY - currentY) > 0.02) {
+        raf = requestAnimationFrame(render);
+      } else {
+        card.style.setProperty('--tilt-x', `${targetX}deg`);
+        card.style.setProperty('--tilt-y', `${targetY}deg`);
+        currentX = targetX;
+        currentY = targetY;
+        raf = 0;
+      }
+    };
+
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(render);
+    };
+
+    card.addEventListener('mousemove', (event) => {
+      const rect = card.getBoundingClientRect();
+      const px = (event.clientX - rect.left) / rect.width - 0.5;
+      const py = (event.clientY - rect.top) / rect.height - 0.5;
+      targetY = px * 7;
+      targetX = -py * 7;
+      kick();
+    });
+
+    card.addEventListener('mouseleave', () => {
+      targetX = 0;
+      targetY = 0;
+      kick();
+    });
+  }
+
+  if (finePointer.matches && !reduceMotion.matches) {
+    document.querySelectorAll('[data-card-tilt]').forEach((node) => {
+      if (node instanceof HTMLElement) bindCardTilt(node);
+    });
+  }
+</script>

@@ -1,0 +1,45 @@
+---
+import PitchPage from '../../components/PitchPage.astro';
+import { pitches, site } from '../../site.config';
+
+const pitch = pitches.data;
+const pageTitle = `${pitch.title} · ${site.name}`;
+
+const stops = [
+  {
+    href: '/projects/operator-user-analytics',
+    title: '广电用户套餐与开通分析',
+    blurb: '实习主分析：套餐 / 开通 / 地区结构；公网练习表演示口径与看板（非公司原表）。',
+  },
+  {
+    href: '/projects/special-food-teddy-cup',
+    title: '特医食品数据分析（泰迪杯）',
+    blurb: 'PDF 抽表、清洗归类、可视化与选品筛选；含读图说明与选品演示；二等奖。',
+  },
+  {
+    href: '/projects/ecommerce-funnel-analysis',
+    title: '电商用户转化漏斗',
+    blurb: 'UCI 公开数据：定义漏斗口径，按渠道下钻流失环节，输出假设而非因果结论。',
+  },
+  {
+    href: '/projects/bidding-search-engine',
+    title: '招投标信息采集与搜索站点',
+    blurb: '同期工程项目背景：爬虫 + 建站；分析主线见用户套餐页。',
+  },
+];
+---
+
+<PitchPage
+  pageTitle={pageTitle}
+  description={pitch.summary}
+  heading={pitch.title}
+  summary={pitch.summary}
+  stops={stops}
+  otherHref={pitches.ai.path}
+  otherLabel={pitches.ai.label}
+>
+  <Fragment slot="rule">
+    每个案例遵循同一结构：结论 → 指标 → 链路 → 发现 → 证据。练习数据与公司业务数据在页内分开说明。也可从
+    <a href="/tour">60 秒导览</a> 进入。
+  </Fragment>
+</PitchPage>

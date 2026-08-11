@@ -1,0 +1,3 @@
+# Cloudflare Pages / Netlify：对简历 PDF 声明不收录（面试官仍可直链或点击下载）
+/files/resume.pdf
+  X-Robots-Tag: noindex, nofollow

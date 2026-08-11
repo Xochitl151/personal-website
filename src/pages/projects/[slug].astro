@@ -1,0 +1,249 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectTakeaway from '../../components/project/ProjectTakeaway.astro';
+import ProjectMetrics from '../../components/project/ProjectMetrics.astro';
+import ProjectPipeline from '../../components/project/ProjectPipeline.astro';
+import ProjectFindings from '../../components/project/ProjectFindings.astro';
+import ProjectToc from '../../components/project/ProjectToc.astro';
+import ProjectLenses from '../../components/project/ProjectLenses.astro';
+import FunnelDemo from '../../components/demo/FunnelDemo.astro';
+import BiddingInsights from '../../components/demo/BiddingInsights.astro';
+import UserInsights from '../../components/demo/UserInsights.astro';
+import ChartGallery from '../../components/demo/ChartGallery.astro';
+import ProductPickerDemo from '../../components/demo/ProductPickerDemo.astro';
+import FeatureExplorer from '../../components/demo/FeatureExplorer.astro';
+import AiWorkflowDemo from '../../components/demo/AiWorkflowDemo.astro';
+import { getCollection, render } from 'astro:content';
+import { projectKinds, splitProjectTags } from '../../lib/projects';
+import { site } from '../../site.config';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const {
+  title,
+  summary,
+  takeaway,
+  metrics,
+  role,
+  kind,
+  tags,
+  date,
+  disclaimer,
+  pipeline,
+  findings,
+  demos,
+  charts,
+  awardImage,
+  awardCaption,
+  lenses,
+  externalLinks,
+} = project.data;
+
+const kindMeta = projectKinds[kind];
+const { skills, meta } = splitProjectTags(tags);
+const pageTitle = `${title} · ${site.name}`;
+const formattedDate = date.toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+});
+const shareImage = charts[0]?.src ?? awardImage;
+---
+
+<BaseLayout title={pageTitle} description={summary} image={shareImage} ogType="article">
+  <article class="project">
+    <div class="container project__shell">
+      <a class="back" href="/projects">← 全部作品</a>
+
+      <header class="project__head reveal">
+        <div class="project__meta">
+          <span class:list={['tag', kindMeta.tagClass]}>{kindMeta.label}</span>
+          <time datetime={date.toISOString()}>{formattedDate}</time>
+        </div>
+        <h1>{title}</h1>
+        <p class="lead">{summary}</p>
+        <p class="project__role"><strong>我的角色：</strong>{role}</p>
+        {
+          (skills.length > 0 || meta.length > 0) && (
+            <ul class="tags">
+              {skills.map((tag) => (
+                <li>
+                  <span class="tag tag--skill">{tag}</span>
+                </li>
+              ))}
+              {meta.map((tag) => (
+                <li>
+                  <span class="tag tag--meta">{tag}</span>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </header>
+
+      <ProjectTakeaway text={takeaway} />
+      <ProjectMetrics metrics={metrics} />
+      <ProjectPipeline steps={pipeline} />
+      <ProjectLenses lenses={lenses} />
+
+      {
+        externalLinks.length > 0 && (
+          <div class="project__links reveal">
+            {
+              externalLinks.map((link) => (
+                <a class="btn btn--ghost" href={link.href} target="_blank" rel="noopener noreferrer">
+                  {link.label} ↗
+                </a>
+              ))
+            }
+          </div>
+        )
+      }
+
+      <ProjectFindings findings={findings} />
+
+      {demos.includes('feature-explorer') && <FeatureExplorer />}
+      {demos.includes('ai-workflow') && <AiWorkflowDemo />}
+      {demos.includes('user-insights') && <UserInsights />}
+      {demos.includes('bidding-insights') && <BiddingInsights />}
+      {demos.includes('funnel') && <FunnelDemo />}
+      {
+        demos.includes('chart-gallery') && (
+          <ChartGallery charts={charts} awardSrc={awardImage} awardCaption={awardCaption} />
+        )
+      }
+      {demos.includes('product-picker') && <ProductPickerDemo />}
+
+      <div class="project__body reveal">
+        <aside class="project__aside">
+          <ProjectToc />
+        </aside>
+        <div class="project__case">
+          <p class="project__case-label">案例说明</p>
+          <div class="prose prose--case">
+            <Content />
+          </div>
+        </div>
+      </div>
+
+      {
+        disclaimer && (
+          <p class="project__disclaimer reveal">{disclaimer}</p>
+        )
+      }
+    </div>
+  </article>
+</BaseLayout>
+
+<script>
+  import '../../scripts/project-page.ts';
+</script>
+
+<style>
+  .project {
+    padding-block: var(--space-section);
+  }
+
+  .project__shell {
+    max-width: 52rem;
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .project__head {
+    margin-bottom: 0.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .project__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .project__head h1 {
+    margin: 0 0 0.5rem;
+  }
+
+  .lead {
+    margin: 0 0 0.75rem;
+    color: var(--color-muted);
+    font-size: 1.05rem;
+  }
+
+  .project__role {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-text);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .project__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .project__body {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .project__case-label {
+    margin: 0 0 1.15rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  @media (min-width: 960px) {
+    .project__shell {
+      max-width: var(--max-width);
+    }
+
+    .project__body {
+      grid-template-columns: minmax(11rem, 14rem) minmax(0, 1fr);
+      align-items: start;
+      gap: 2.25rem;
+    }
+  }
+
+  .project__disclaimer {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    border-top: 1px solid var(--color-border);
+  }
+</style>

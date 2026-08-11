@@ -1,0 +1,45 @@
+---
+import PitchPage from '../../components/PitchPage.astro';
+import { pitches, site } from '../../site.config';
+
+const pitch = pitches.ai;
+const pageTitle = `${pitch.title} · ${site.name}`;
+
+const stops = [
+  {
+    href: '/projects/bidding-search-engine',
+    title: '招投标信息采集与搜索站点',
+    blurb: '爬虫采集 + 搜索站点：AI 辅助实现，人工验收主流程；未长期正式运营。',
+  },
+  {
+    href: '/projects/special-food-teddy-cup',
+    title: '特医食品 · 从 PDF 到选品',
+    blurb: '非聊天演示：从非结构化说明书到可筛产品的闭环，含异常处理规则与抽检思路。',
+  },
+  {
+    href: '/projects/operator-user-analytics',
+    title: '用户套餐分析（懂业务数据）',
+    blurb: '说明能把套餐 / 开通 / 地区等业务字段整理清楚，支撑产品侧看结构。',
+  },
+  {
+    href: '/projects/ecommerce-funnel-analysis',
+    title: '电商转化漏斗',
+    blurb: '公开数据上的漏斗与渠道下钻，适合关注增长与转化链路时参考。',
+  },
+];
+---
+
+<PitchPage
+  pageTitle={pageTitle}
+  description={pitch.summary}
+  heading={pitch.title}
+  summary={pitch.summary}
+  stops={stops}
+  otherHref={pitches.data.path}
+  otherLabel={pitches.data.label}
+>
+  <Fragment slot="rule">
+    重点看人机分工：AI 提速实现，验收与业务口径由人把关。也可从
+    <a href="/tour">60 秒导览</a> 进入全部案例。
+  </Fragment>
+</PitchPage>

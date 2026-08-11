@@ -1,0 +1,33 @@
+---
+import { site } from '../site.config';
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer__inner">
+    <p class="footer__copy">Copyright © {year} {site.name}</p>
+    <p class="footer__note">作品集 · 上线交付与练习分析分开说明</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: var(--space-section);
+    padding-block: 2.5rem;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted);
+    font-size: 0.8rem;
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .footer__copy,
+  .footer__note {
+    margin: 0;
+  }
+</style>

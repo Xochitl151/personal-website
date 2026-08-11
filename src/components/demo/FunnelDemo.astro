@@ -1,0 +1,273 @@
+---
+import AnalysisBoard from '../AnalysisBoard.astro';
+import { getFunnelChannels, getFunnelByChannel, getFunnelInsight } from '../../lib/demo-data';
+
+const channels = getFunnelChannels();
+const defaultChannel = channels[0]?.id ?? '';
+const defaultRows = defaultChannel ? getFunnelByChannel(defaultChannel) : [];
+const defaultInsight = defaultChannel ? getFunnelInsight(defaultChannel) : '';
+---
+
+<section class="demo reveal" data-demo="funnel" aria-label="电商漏斗示意">
+  <div class="demo__head">
+    <h2>转化漏斗</h2>
+    <p class="demo__hint">UCI 公开练习数据 · 按渠道查看各步留存</p>
+  </div>
+
+  <div class="demo__board">
+    <AnalysisBoard size="compact" label="漏斗分析 · 看板示意" variant="funnel" />
+  </div>
+
+  <div class="demo__controls">
+    <label>
+      <span>渠道</span>
+      <select data-funnel-channel>
+        {
+          channels.map(({ id, label }) => (
+            <option value={id} selected={id === defaultChannel}>
+              {label}
+            </option>
+          ))
+        }
+      </select>
+    </label>
+  </div>
+
+  <div class="funnel" data-funnel-bars>
+    {
+      defaultRows.map((row, i) => (
+        <div class="funnel__row" style={`--i: ${i}`}>
+          <span class="funnel__label">{row.step}</span>
+          <div class="funnel__track">
+            <div
+              class="funnel__bar"
+              data-pct={row.pct}
+              style={`--target: ${row.pct}%`}
+            />
+          </div>
+          <span class="funnel__value">
+            {row.sessions.toLocaleString('zh-CN')}
+            <small>{row.pct}%</small>
+          </span>
+        </div>
+      ))
+    }
+  </div>
+
+  <p class="demo__insight" data-funnel-insight>{defaultInsight}</p>
+</section>
+
+<script define:vars={{ channels, funnelData: Object.fromEntries(channels.map(({ id }) => [id, getFunnelByChannel(id)])), funnelInsights: Object.fromEntries(channels.map(({ id }) => [id, getFunnelInsight(id)])) }}>
+  const root = document.querySelector('[data-demo="funnel"]');
+  const select = root?.querySelector('[data-funnel-channel]');
+  const bars = root?.querySelector('[data-funnel-bars]');
+  const insight = root?.querySelector('[data-funnel-insight]');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function rowHtml(row, i) {
+    return `
+      <div class="funnel__row" style="--i: ${i}">
+        <span class="funnel__label">${row.step}</span>
+        <div class="funnel__track">
+          <div class="funnel__bar" data-pct="${row.pct}" style="--target: ${row.pct}%"></div>
+        </div>
+        <span class="funnel__value">
+          ${row.sessions.toLocaleString('zh-CN')}
+          <small>${row.pct}%</small>
+        </span>
+      </div>`;
+  }
+
+  function playBars() {
+    if (!bars) return;
+    const barEls = bars.querySelectorAll('.funnel__bar');
+    barEls.forEach((bar) => {
+      bar.classList.remove('is-grown');
+    });
+    if (reduceMotion) {
+      barEls.forEach((bar) => bar.classList.add('is-grown'));
+      return;
+    }
+    void bars.offsetWidth;
+    requestAnimationFrame(() => {
+      barEls.forEach((bar) => bar.classList.add('is-grown'));
+    });
+  }
+
+  function render(id) {
+    const rows = funnelData[id] ?? [];
+    if (bars) {
+      bars.innerHTML = rows.map((row, i) => rowHtml(row, i)).join('');
+    }
+    if (insight) insight.textContent = funnelInsights[id] ?? '';
+    playBars();
+  }
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          playBars();
+          io.disconnect();
+        }
+      });
+    },
+    { threshold: 0.25 },
+  );
+  if (root) io.observe(root);
+
+  select?.addEventListener('change', () => {
+    render(select.value);
+  });
+</script>
+
+<style>
+  .demo {
+    margin-bottom: 2.5rem;
+    padding: 1.35rem;
+    background: var(--color-surface);
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .demo__head h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    border: none;
+    padding: 0;
+  }
+
+  .demo__hint {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .demo__board {
+    margin-bottom: 1.15rem;
+  }
+
+  .demo__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .demo__controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+
+  .demo__controls select {
+    min-width: 11rem;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg);
+  }
+
+  .funnel {
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .funnel__row {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 0;
+    transform: translateX(-6px);
+    animation: funnel-row-in 0.4s ease forwards;
+    animation-delay: calc(var(--i, 0) * 0.07s);
+  }
+
+  .funnel__label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+
+  .funnel__track {
+    height: 0.7rem;
+    background: var(--color-bg);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .funnel__bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #5eead4, var(--color-accent));
+    border-radius: 999px;
+    transform-origin: left center;
+    box-shadow: 0 0 12px rgb(45 212 191 / 25%);
+  }
+
+  .funnel__bar.is-grown {
+    width: var(--target);
+    transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: calc(var(--i, 0) * 0.07s + 0.05s);
+  }
+
+  .funnel__value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    min-width: 5rem;
+  }
+
+  .funnel__value small {
+    display: block;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+
+  .demo__insight {
+    margin: 1rem 0 0;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.875rem;
+    color: var(--color-text);
+    background: #f0fdfa;
+    border-radius: 8px;
+  }
+
+  @keyframes funnel-row-in {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .funnel__row {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .funnel__value {
+      text-align: left;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .funnel__row {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+
+    .funnel__bar,
+    .funnel__bar.is-grown {
+      transition: none;
+      width: var(--target);
+    }
+  }
+</style>
