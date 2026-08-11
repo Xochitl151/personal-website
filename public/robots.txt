@@ -4,4 +4,4 @@ Allow: /
 Disallow: /files/resume.pdf
 Disallow: /resume
 
-Sitemap: https://example.pages.dev/sitemap-index.xml
+Sitemap: https://personal-website-8ja.pages.dev/sitemap-index.xml
