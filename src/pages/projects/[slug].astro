@@ -6,13 +6,13 @@ import ProjectPipeline from '../../components/project/ProjectPipeline.astro';
 import ProjectFindings from '../../components/project/ProjectFindings.astro';
 import ProjectToc from '../../components/project/ProjectToc.astro';
 import ProjectLenses from '../../components/project/ProjectLenses.astro';
-import FunnelDemo from '../../components/demo/FunnelDemo.astro';
 import BiddingInsights from '../../components/demo/BiddingInsights.astro';
 import UserInsights from '../../components/demo/UserInsights.astro';
 import ChartGallery from '../../components/demo/ChartGallery.astro';
 import ProductPickerDemo from '../../components/demo/ProductPickerDemo.astro';
 import FeatureExplorer from '../../components/demo/FeatureExplorer.astro';
 import AiWorkflowDemo from '../../components/demo/AiWorkflowDemo.astro';
+import BiddingBrowseDemo from '../../components/demo/BiddingBrowseDemo.astro';
 import { getCollection, render } from 'astro:content';
 import { projectKinds, splitProjectTags } from '../../lib/projects';
 import { site } from '../../site.config';
@@ -38,6 +38,8 @@ const {
   date,
   disclaimer,
   pipeline,
+  pipelineLabel,
+  pipelineHighlight,
   findings,
   demos,
   charts,
@@ -45,22 +47,25 @@ const {
   awardCaption,
   lenses,
   externalLinks,
+  dateLabel,
 } = project.data;
 
 const kindMeta = projectKinds[kind];
 const { skills, meta } = splitProjectTags(tags);
 const pageTitle = `${title} · ${site.name}`;
-const formattedDate = date.toLocaleDateString('zh-CN', {
-  year: 'numeric',
-  month: 'long',
-});
+const formattedDate =
+  dateLabel ||
+  date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+  });
 const shareImage = charts[0]?.src ?? awardImage;
 ---
 
 <BaseLayout title={pageTitle} description={summary} image={shareImage} ogType="article">
   <article class="project">
     <div class="container project__shell">
-      <a class="back" href="/projects">← 全部作品</a>
+      <a class="back" href="/#cases">← 返回作品</a>
 
       <header class="project__head reveal">
         <div class="project__meta">
@@ -90,7 +95,7 @@ const shareImage = charts[0]?.src ?? awardImage;
 
       <ProjectTakeaway text={takeaway} />
       <ProjectMetrics metrics={metrics} />
-      <ProjectPipeline steps={pipeline} />
+      <ProjectPipeline steps={pipeline} label={pipelineLabel} highlight={pipelineHighlight} />
       <ProjectLenses lenses={lenses} />
 
       {
@@ -109,16 +114,16 @@ const shareImage = charts[0]?.src ?? awardImage;
 
       <ProjectFindings findings={findings} />
 
-      {demos.includes('feature-explorer') && <FeatureExplorer />}
-      {demos.includes('ai-workflow') && <AiWorkflowDemo />}
-      {demos.includes('user-insights') && <UserInsights />}
-      {demos.includes('bidding-insights') && <BiddingInsights />}
-      {demos.includes('funnel') && <FunnelDemo />}
       {
         demos.includes('chart-gallery') && (
           <ChartGallery charts={charts} awardSrc={awardImage} awardCaption={awardCaption} />
         )
       }
+      {demos.includes('bidding-browse') && <BiddingBrowseDemo />}
+      {demos.includes('feature-explorer') && <FeatureExplorer />}
+      {demos.includes('ai-workflow') && <AiWorkflowDemo />}
+      {demos.includes('user-insights') && <UserInsights />}
+      {demos.includes('bidding-insights') && <BiddingInsights />}
       {demos.includes('product-picker') && <ProductPickerDemo />}
 
       <div class="project__body reveal">

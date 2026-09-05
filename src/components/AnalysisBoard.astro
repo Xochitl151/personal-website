@@ -1,38 +1,55 @@
 ---
 /**
  * 分析看板骨架示意（同 SearchStage 视觉语言）
- * hero：首页/导览大示意；compact：项目页装饰
+ * hero：首页大示意；compact：项目页装饰
  */
 interface Props {
   size?: 'hero' | 'compact';
   label?: string;
-  /** keywords：关键词分析；funnel：漏斗分析 */
-  variant?: 'keywords' | 'funnel';
+  /** packages：套餐/在网；keywords：关键词；funnel：漏斗 */
+  variant?: 'packages' | 'keywords' | 'funnel';
 }
 
 const {
   size = 'hero',
-  label = '分析看板 · 示意',
-  variant = 'keywords',
+  label = '分析看板 · 预览',
+  variant = 'packages',
 } = Astro.props;
 
-const kpis =
-  variant === 'funnel'
-    ? [
-        { label: '总会话', value: '12.3k' },
-        { label: '意向率', value: '18%' },
-        { label: '成交率', value: '9.2%' },
-      ]
-    : [
-        { label: '搜索量', value: '8.4k' },
-        { label: '点击', value: '4.1k' },
-        { label: '均 CTR', value: '48%' },
-      ];
+const presets = {
+  packages: {
+    kpis: [
+      { label: '用户数', value: '7.0k' },
+      { label: '在网率', value: '73%' },
+      { label: '套餐类', value: '3' },
+    ],
+    bars: [88, 71, 54, 36, 22],
+    chartLabel: '套餐结构',
+    chips: ['套餐', '在网', '业务'],
+  },
+  keywords: {
+    kpis: [
+      { label: '搜索量', value: '8.4k' },
+      { label: '点击', value: '4.1k' },
+      { label: '均 CTR', value: '48%' },
+    ],
+    bars: [86, 72, 55, 38, 24],
+    chartLabel: '词类分布',
+    chips: ['时间', '渠道', '词类'],
+  },
+  funnel: {
+    kpis: [
+      { label: '总会话', value: '12.3k' },
+      { label: '意向率', value: '18%' },
+      { label: '成交率', value: '9.2%' },
+    ],
+    bars: [92, 64, 41, 28, 18],
+    chartLabel: '漏斗留存',
+    chips: ['渠道', '步骤', '日期'],
+  },
+} as const;
 
-const bars =
-  variant === 'funnel'
-    ? [92, 64, 41, 28, 18]
-    : [86, 72, 55, 38, 24];
+const { kpis, bars, chartLabel, chips } = presets[variant];
 ---
 
 <div
@@ -58,9 +75,7 @@ const bars =
   </div>
 
   <div class="board__chart">
-    <div class="board__chart-label">
-      {variant === 'funnel' ? '漏斗留存' : '词类分布'}
-    </div>
+    <div class="board__chart-label">{chartLabel}</div>
     <div class="board__bars">
       {
         bars.map((pct, i) => (
@@ -76,9 +91,9 @@ const bars =
   </div>
 
   <div class="board__filters">
-    {(variant === 'funnel' ? ['渠道', '步骤', '日期'] : ['时间', '渠道', '词类']).map(
-      (chip) => <span>{chip}</span>,
-    )}
+    {chips.map((chip) => (
+      <span>{chip}</span>
+    ))}
   </div>
 </div>
 

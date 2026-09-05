@@ -3,66 +3,12 @@ import path from 'node:path';
 
 const root = process.cwd();
 
-export type FunnelRow = {
-  channel: string;
-  step: string;
-  sessions: number;
-  pct: number;
-};
-
 export type BiddingKeyword = {
   keyword: string;
   search: number;
   clicks: number;
   ctr: number;
 };
-
-const FUNNEL_STEPS = ['总会话', '浏览商品页', '深度浏览', '有购买意向信号', '成交'] as const;
-
-/** UCI 渠道编号 → 业务可读名（练习数据口径） */
-const CHANNEL_LABELS: Record<string, string> = {
-  渠道类型1: 'Referral 引荐',
-  渠道类型2: 'Direct 直接访问',
-  渠道类型3: 'Social 社交',
-  渠道类型4: 'Email 邮件',
-  渠道类型13: 'Paid 付费推广',
-  渠道类型20: 'Other 其他',
-};
-
-export function getFunnelChannels(): { id: string; label: string }[] {
-  const raw = fs.readFileSync(path.join(root, 'data/02-电商漏斗/01-漏斗汇总_按渠道.csv'), 'utf8');
-  const channels = [...new Set(raw.trim().split('\n').slice(1).map((line) => line.split(',')[0]))];
-  const preferred = ['渠道类型2', '渠道类型13', '渠道类型1', '渠道类型3', '渠道类型4', '渠道类型20'];
-  const ordered = [
-    ...preferred.filter((c) => channels.includes(c)),
-    ...channels.filter((c) => !preferred.includes(c)),
-  ].slice(0, 6);
-
-  return ordered.map((id) => ({
-    id,
-    label: CHANNEL_LABELS[id] ?? id,
-  }));
-}
-
-export function getFunnelByChannel(channelId: string): FunnelRow[] {
-  const raw = fs.readFileSync(path.join(root, 'data/02-电商漏斗/01-漏斗汇总_按渠道.csv'), 'utf8');
-  const rows = raw
-    .trim()
-    .split('\n')
-    .slice(1)
-    .map((line) => {
-      const [channel, step, sessions, pct] = line.split(',');
-      return {
-        channel,
-        step,
-        sessions: Number(sessions),
-        pct: Number(pct),
-      };
-    })
-    .filter((row) => row.channel === channelId && FUNNEL_STEPS.includes(row.step as (typeof FUNNEL_STEPS)[number]));
-
-  return FUNNEL_STEPS.map((step) => rows.find((r) => r.step === step)).filter(Boolean) as FunnelRow[];
-}
 
 export function getBiddingChannels(): string[] {
   const raw = fs.readFileSync(path.join(root, 'data/01-招投标搜索/02-实习级练习.csv'), 'utf8');
@@ -170,18 +116,4 @@ export function getUserServiceSummary(): UserServiceRow[] {
 /** @deprecated 使用 getUserServiceSummary */
 export function getUserRegionSummary() {
   return getUserServiceSummary();
-}
-
-export function getFunnelInsight(channelId: string): string {
-  const rows = getFunnelByChannel(channelId);
-  if (rows.length < 2) return '选择渠道后可查看各步转化率。';
-
-  const rates = rows.slice(1).map((row, i) => ({
-    from: rows[i].step,
-    to: row.step,
-    rate: rows[i].sessions ? Math.round((row.sessions / rows[i].sessions) * 1000) / 10 : 0,
-  }));
-
-  const weakest = rates.reduce((min, r) => (r.rate < min.rate ? r : min), rates[0]);
-  return `「${weakest.from} → ${weakest.to}」转化率最低（${weakest.rate}%），优先排查该环节体验或意图匹配。`;
 }

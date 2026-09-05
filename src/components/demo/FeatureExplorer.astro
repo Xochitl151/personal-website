@@ -1,44 +1,43 @@
 ---
 /**
- * 招投标搜索 · 功能模块示意
- * 文案可按真实模块再改 features 数组
+ * 招投标搜索 · 功能模块
  */
 const features = [
   {
     id: 'search',
-    title: '全文检索',
-    blurb: '按关键词快速定位标讯',
+    title: '关键词检索',
+    blurb: '标题检索 + 快捷词',
     detail:
-      '支持标题与正文检索；空结果与常见错别字有提示，避免业务同学「搜不到就放弃」。',
+      '支持标题关键词检索，以及任意匹配 / 全部匹配；首页提供专线、短信、政务云、广东等快捷关键词，降低业务侧记忆成本。',
   },
   {
     id: 'filter',
     title: '条件筛选',
-    blurb: '地区、时间、类型组合过滤',
+    blurb: '日期与来源组合过滤',
     detail:
-      '多条件可叠加；筛空时给出可理解的空态，而不是空白页或报错栈。',
+      '可按起止日期、网站来源筛选，并按时间升降序查看；筛空时给出可理解的空态，而不是空白页。',
   },
   {
     id: 'list',
     title: '结果列表',
-    blurb: '字段对齐业务阅读习惯',
+    blurb: '标题 / 时间 / 来源 / 关键词',
     detail:
-      '列表列与摘要口径与业务文档一致；关键信息一眼可见，减少来回点开详情。',
+      '列表对齐业务阅读习惯：标题、发布时间、来源站点与命中关键词一眼可见，减少反复点开详情。',
   },
   {
     id: 'export',
-    title: '导出 / 留痕',
-    blurb: '便于协作与后续核对',
+    title: '导出与更新',
+    blurb: 'CSV 导出 · 爬取刷新',
     detail:
-      '支持导出或操作留痕（按权限）；方便运营复盘与问题追溯，而不是只停留在页面上。',
+      '支持导出 CSV；可手动触发爬取并查看运行状态（见联调截图）。',
   },
 ];
 ---
 
-<section class="demo reveal" data-demo="features" aria-label="功能模块示意">
+<section class="demo reveal" data-demo="features" aria-label="功能模块">
   <div class="demo__head">
     <h2>功能模块</h2>
-    <p class="demo__hint">检索相关模块与界面示意</p>
+    <p class="demo__hint">检索能力说明 · 证据见上方截图与样例表</p>
   </div>
 
   <div class="feat">
@@ -80,9 +79,9 @@ const features = [
           <span class="mock__search">搜索招投标信息…</span>
         </div>
         <div class="mock__filters">
-          <span>地区</span>
-          <span>时间</span>
-          <span>类型</span>
+          <span>来源</span>
+          <span>日期</span>
+          <span>关键词</span>
         </div>
         <div class="mock__rows">
           <div class="mock__row" />

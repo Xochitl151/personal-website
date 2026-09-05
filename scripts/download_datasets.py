@@ -1,32 +1,20 @@
 #!/usr/bin/env python3
-"""Download public datasets into data/. Re-run if a download fails."""
+"""Download optional public datasets into data/. Re-run if a download fails."""
 
 from __future__ import annotations
 
-import io
 import os
 import urllib.request
-import zipfile
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "data"))
 
 UA = {"User-Agent": "Mozilla/5.0"}
 
-FUNNEL = os.path.join(ROOT, "02-电商漏斗")
-RETAIL = os.path.join(ROOT, "03-交易明细")
-OLIST = os.path.join(FUNNEL, "04-Olist巴西电商")
-UCI_SHOPPERS = os.path.join(FUNNEL, "02-UCI购物意图")
-UCI_CLICK = os.path.join(FUNNEL, "03-UCI点击流")
+TELCO_DIR = os.path.join(ROOT, "04-用户套餐分析")
+TELCO_RAW = os.path.join(TELCO_DIR, "raw-telco-customer-churn.csv")
 
-
-def dl_zip(url: str, outdir: str) -> None:
-    os.makedirs(outdir, exist_ok=True)
-    print(f"Downloading {url} ...")
-    req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=300) as r:
-        z = zipfile.ZipFile(io.BytesIO(r.read()))
-        z.extractall(outdir)
-    print("  ->", os.listdir(outdir))
+# IBM Telco 在 Kaggle；无稳定直链时提示手动下载
+TELCO_HINT = "https://www.kaggle.com/datasets/blastchar/telco-customer-churn"
 
 
 def dl_file(url: str, path: str) -> None:
@@ -41,58 +29,15 @@ def dl_file(url: str, path: str) -> None:
 
 
 def main() -> None:
-    tasks = [
-        (
-            "uci_clickstream",
-            lambda: dl_zip(
-                "https://archive.ics.uci.edu/static/public/553/clickstream+data+for+online+shopping.zip",
-                UCI_CLICK,
-            ),
-        ),
-        (
-            "uci_online_shoppers",
-            lambda: dl_zip(
-                "https://archive.ics.uci.edu/static/public/468/online+shoppers+purchasing+intention+dataset.zip",
-                UCI_SHOPPERS,
-            ),
-        ),
-        (
-            "uci_online_retail_ii",
-            lambda: dl_zip(
-                "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip",
-                RETAIL,
-            ),
-        ),
-    ]
+    if os.path.isfile(TELCO_RAW) and os.path.getsize(TELCO_RAW) > 1000:
+        print("skip (exists)", TELCO_RAW)
+    else:
+        print("Telco CSV 需从 Kaggle 手动下载：")
+        print(" ", TELCO_HINT)
+        print("  保存为:", TELCO_RAW)
+        print("  见 data/00-手动下载说明.md")
 
-    olist_base = "https://raw.githubusercontent.com/olist/work-at-olist-data/master/datasets/"
-    olist_files = [
-        "olist_orders_dataset.csv",
-        "olist_order_items_dataset.csv",
-        "olist_customers_dataset.csv",
-        "olist_order_payments_dataset.csv",
-        "olist_products_dataset.csv",
-        "product_category_name_translation.csv",
-    ]
-    for fn in olist_files:
-        out = os.path.join(OLIST, fn)
-
-        def _dl(f=fn, p=out):
-            if os.path.isfile(p) and os.path.getsize(p) > 1000:
-                print("skip (exists)", os.path.basename(p))
-                return
-            dl_file(olist_base + f, p)
-
-        tasks.append((f"olist/{fn}", _dl))
-
-    for name, fn in tasks:
-        try:
-            fn()
-        except Exception as e:
-            print(f"FAILED {name}: {e}")
-            print("  See data/00-手动下载说明.md")
-
-    print("\nDone. See data/README.md")
+    print("\nDone. 主线数据见 data/README.md（电商/交易明细已移除）")
 
 
 if __name__ == "__main__":

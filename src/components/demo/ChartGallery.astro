@@ -40,6 +40,7 @@ const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
   limits: limits ?? '',
   next: next ?? '',
 }));
+
 ---
 
 <section class="demo reveal" data-demo="chart-gallery" aria-label="分析图库">
@@ -85,7 +86,14 @@ const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
 
       <div class="reader__stage">
         <figure class="reader__figure">
-          <img data-chart-img src={items[0].src} alt={items[0].alt} loading="lazy" />
+          <img
+            data-chart-img
+            src={items[0].src}
+            alt={items[0].alt}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
         </figure>
         <div class="reader__copy" data-chart-copy>
           <h3 data-chart-title>{items[0].alt}</h3>
@@ -112,7 +120,7 @@ const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
         <div class="award">
           <p class="award__caption">{awardCaption}</p>
           <figure class="award__figure">
-            <img src={awardSrc} alt={awardCaption} loading="lazy" />
+            <img src={awardSrc} alt={awardCaption} loading="lazy" decoding="async" />
           </figure>
         </div>
       </div>
@@ -150,14 +158,33 @@ const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
     const nextRow = root.querySelector('[data-chart-next]');
     const nextSpan = root.querySelector('[data-chart-next] span');
     const stage = root.querySelector('.reader__stage');
+    const cache = new Map();
+
+    const warm = (src) => {
+      if (!src || cache.has(src)) return cache.get(src);
+      const probe = new Image();
+      const done = new Promise((resolve) => {
+        if (probe.complete && probe.naturalWidth) resolve();
+        else {
+          probe.onload = () => resolve();
+          probe.onerror = () => resolve();
+        }
+      });
+      probe.src = src;
+      cache.set(src, done);
+      return done;
+    };
+
+    chartData.forEach((item) => warm(item.src));
 
     const show = (index) => {
       const item = chartData[index];
       if (!item || !(img instanceof HTMLImageElement)) return;
 
-      stage?.classList.add('is-switching');
-      window.setTimeout(() => {
-        img.src = item.src;
+      const apply = () => {
+        if (img.src !== new URL(item.src, location.href).href) {
+          img.src = item.src;
+        }
         img.alt = item.alt;
         if (title) title.textContent = item.alt;
         if (proves) proves.textContent = item.proves;
@@ -181,7 +208,16 @@ const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
         });
 
         stage?.classList.remove('is-switching');
-      }, 120);
+      };
+
+      stage?.classList.add('is-switching');
+      const pending = warm(item.src);
+      const start = performance.now();
+      pending.then(() => {
+        // 仅在图已就绪时立刻切换；避免固定延时造成「慢一步」
+        const wait = Math.max(0, 40 - (performance.now() - start));
+        window.setTimeout(apply, wait);
+      });
     };
 
     navBtns.forEach((btn) => {
@@ -303,11 +339,11 @@ const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
   .reader__stage {
     display: grid;
     gap: 1rem;
-    transition: opacity 0.12s ease;
+    transition: opacity 0.08s ease;
   }
 
   .reader__stage.is-switching {
-    opacity: 0.35;
+    opacity: 0.55;
   }
 
   .reader__figure {
@@ -326,6 +362,7 @@ const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
   .reader__figure img {
     width: auto;
     max-width: 100%;
+    height: auto;
     max-height: min(24rem, 52vh);
     object-fit: contain;
     border-radius: 10px;
@@ -392,6 +429,7 @@ const chartData = items.map(({ src, alt, label, proves, limits, next }) => ({
   .award__figure img {
     width: auto;
     max-width: 100%;
+    height: auto;
     max-height: min(20rem, 46vh);
     margin-inline: auto;
     object-fit: contain;

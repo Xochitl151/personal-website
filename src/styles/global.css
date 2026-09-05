@@ -7,8 +7,8 @@
   --color-accent: #0f766e;
   --color-accent-hover: #115e59;
   --color-accent-soft: #ecfdf5;
-  --font-display: 'Outfit', 'Noto Sans SC', system-ui, sans-serif;
-  --font-body: 'Noto Sans SC', system-ui, sans-serif;
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --radius: 14px;
   --radius-ctrl: 980px;
   --shadow: 0 1px 2px rgb(28 25 23 / 4%), 0 8px 24px rgb(28 25 23 / 4%);
@@ -213,10 +213,10 @@ ol {
 
 .reveal {
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(8px);
   transition:
-    opacity 0.55s ease,
-    transform 0.55s ease;
+    opacity 0.32s ease,
+    transform 0.32s ease;
   transition-delay: calc(var(--reveal-delay, 0) * 1ms);
 }
 

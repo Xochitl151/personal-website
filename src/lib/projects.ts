@@ -1,6 +1,6 @@
 export const projectKinds = {
   intern: { label: '实习交付', tagClass: 'tag--intern' },
-  independent: { label: '个人练习', tagClass: 'tag--independent' },
+  independent: { label: '数据案例', tagClass: 'tag--independent' },
   contest: { label: '竞赛作品', tagClass: 'tag--contest' },
   side: { label: '副线', tagClass: 'tag--side' },
 } as const;

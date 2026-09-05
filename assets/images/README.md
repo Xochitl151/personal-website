@@ -1,38 +1,21 @@
-# 图片与证书放哪
+# 图片与证书
 
-> **网站只读 `public/`**。`assets/images/` 是原件仓库，改完要 **复制到 public** 才会在浏览器里出现。
+> 网站只读 `public/`。`assets/` 是原件；复制过去才会显示。
 
----
+| 材料 | → public | 展示 |
+|------|----------|------|
+| 认证杯 / CET4 / 学籍 PDF | `files/credentials/` | 关于页 |
+| 泰迪杯 B 奖状 | `images/projects/special-food/` | 特医页 + 关于 |
+| 证件照 | 不上站 | — |
+| 项目图 | `images/projects/...` | 各项目页 |
 
-## 展示位置（推荐）
+**勿混：** 泰迪杯 A 题奖状 ≠ B 题特医。奖学金电子版有了再挂关于页。
 
-| 材料 | 放哪 | 网站展示 |
-|------|------|----------|
-| 认证杯 PDF、CET4、学籍报告 | `credentials/` → 复制到 `public/files/credentials/` | **关于页** → 荣誉与证明 / 教育 |
-| 泰迪杯特医食品二等奖 PNG | `credentials/teddy-cup-award-B.png` | **特医项目页** + 关于页 |
-| 证件照 | `private/` | ❌ 不上站 |
-| 项目分析图 | `assets/projects/.../screenshots/` → `public/images/projects/...` | 各 **项目页** |
+文件名对照（复制时）：
 
----
-
-## `credentials/` 文件与 public 路径
-
-| 原件（assets） | 网站路径（public） | 关于页 |
-|----------------|-------------------|--------|
-| `认证杯-2023-第十六届-二等奖.pdf` | `/files/credentials/certification-cup-2023-second-prize.pdf` | 荣誉与证明 |
-| `CET4.pdf` | `/files/credentials/cet4.pdf` | 荣誉与证明 |
-| `教育部学籍在线验证报告_徐华凤 .pdf` | `/files/credentials/xuexin-enrollment-verification.pdf` | 教育 |
-| `teddy-cup-award-B.png`（特医食品 · **二等奖**） | `/images/projects/special-food/teddy-cup-award-b.png` | 泰迪杯项目页 + 关于页 |
-| `teddy-cup-award-A.png`（自动化生产线 · 三等奖，**另一题**） | 不上特医项目页 | 勿与 B 混用 |
-
-**校级奖学金**：没有电子版，关于页只写文字。
-
-新增 PDF：放进 `credentials/` 后复制到 `public/files/credentials/`，再在 `src/pages/about.astro` 加一行链接。
-
----
-
-## 为什么之前看不到
-
-文件在 **`assets/images/credentials/`** 不会自动上网站；必须复制到 **`public/files/credentials/`**（或图片到 `public/images/`）。
-
-**面试只背**：`docs/02-面试/00-纯记忆版.md`
+| assets 原件 | public 路径 |
+|-------------|-------------|
+| `认证杯-2023-….pdf` | `/files/credentials/certification-cup-2023-second-prize.pdf` |
+| `CET4.pdf` | `/files/credentials/cet4.pdf` |
+| 学籍验证报告 | `/files/credentials/xuexin-enrollment-verification.pdf` |
+| `teddy-cup-award-B.png` | `/images/projects/special-food/teddy-cup-award-b.png` |

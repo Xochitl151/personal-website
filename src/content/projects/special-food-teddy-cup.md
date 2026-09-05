@@ -2,12 +2,14 @@
 title: 特医食品数据分析（泰迪杯）
 summary: 泰迪杯 B 题：用 Python 批量解析国食注字 PDF，抽取营养成分与适用人群，完成统计可视化与选品筛选。
 takeaway: 把特医食品 PDF 说明书变成结构化数据，并从登记趋势、人群分布、成分等维度支撑选品。
+lookFor: 分析图库与选品筛选
 role: 数据分析：PDF 批量抽取、字段清洗、适用人群归类、可视化与产品筛选逻辑。
-date: 2024-05-01
+date: 2024-11-10
+dateLabel: "2024.09 – 2024.11"
 tags: [泰迪杯, Python, pdfplumber, 可视化, Pandas]
 kind: contest
 featured: true
-order: 3
+order: 2
 metrics:
   - label: 赛题
     value: 泰迪杯 B 题
@@ -34,33 +36,33 @@ demos:
   - chart-gallery
   - product-picker
 awardImage: /images/projects/special-food/teddy-cup-award-b.jpg
-awardCaption: 第七届泰迪杯数据挖掘挑战赛 B 题 · 特医食品方向 · 二等奖
+awardCaption: 2024 年（第 7 届）泰迪杯数据分析技能赛 · B 题特医食品 · 二等奖
 charts:
-  - src: /images/projects/special-food/2.1.png
+  - src: /images/projects/special-food/2.1.jpg
     label: 获批量趋势
     alt: 不同登记年份与产品来源的获批量趋势
     proves: 2018 年后获批量明显上升，进口与国产来源并存。
     limits: 仅赛题样本时间窗，不代表全市场增速。
     next: 业务选品时应用最新注册库按同一口径复算趋势。
-  - src: /images/projects/special-food/2.2.png
+  - src: /images/projects/special-food/2.2.jpg
     label: 人群分布
     alt: 产品来源与适用人群类别分布（旭日图）
     proves: 婴配类在结构中占主导，1 岁以上品类分布更分散。
     limits: 人群标签依赖 PDF 文本归类规则，边界样本可能被粗分。
     next: 抽检归类错误率；必要时用更细标签二次校验。
-  - src: /images/projects/special-food/2.3.png
+  - src: /images/projects/special-food/2.3.jpg
     label: 类别获批
     alt: 不同产品类别的获批量
     proves: 氨基酸、水解、全营养等类别获批量差异明显。
     limits: 柱高是样本内计数，不能直接当作市场份额。
     next: 结合渠道可得性，把「登记多」转成可落地的候选清单。
-  - src: /images/projects/special-food/2.4.png
+  - src: /images/projects/special-food/2.4.jpg
     label: 成分分布
     alt: 脂肪与蛋白质含量频数分布
     proves: 成分分布呈右偏，极端值需单独标注口径。
     limits: 未做配方合规判定，只描述分布形态。
     next: 对极端值回溯原 PDF；选品时设定成分区间后再人工复核。
-  - src: /images/projects/special-food/2.5.png
+  - src: /images/projects/special-food/2.5.jpg
     label: 适用词云
     alt: 适用人群词云
     proves: 「过敏」「消化吸收」「营养补充」等为高频适用场景词。
@@ -79,12 +81,11 @@ lenses:
       - 闭环：抽取 → 清洗 → 可视化 → 选品筛选，页内可演示。
       - 人机分工：脚本提速批量处理，版式异常靠规则与人工抽检。
       - 价值：从说明书文本到「按人群/症状给出候选」的决策辅助。
-disclaimer: 泰迪杯比赛项目；PDF 为赛题/公开注册信息材料，与实习公司业务无关。
 ---
 
 ## 背景
 
-特殊医学用途配方食品的注册信息分散在大量 **国食注字** 系列 PDF 说明书中，版式不统一。第七届泰迪杯 B 题要求：将 PDF 转为结构化表 → 统计可视化 → 按人群/症状筛选产品。
+特殊医学用途配方食品的注册信息分散在大量 **国食注字** 系列 PDF 说明书中，版式不统一。2024 年（第 7 届）泰迪杯数据分析技能赛 B 题要求：将 PDF 转为结构化表 → 统计可视化 → 按人群/症状筛选产品。
 
 ## 我做了什么
 
@@ -94,4 +95,4 @@ disclaimer: 泰迪杯比赛项目；PDF 为赛题/公开注册信息材料，与
 
 ## 局限
 
-PDF 抽取无法完全自动化；赛题样本不等于全市场；页内选品演示为脱敏样本子集。
+PDF 抽取无法完全自动化；赛题样本不等于全市场；页内选品为赛题样本子集。

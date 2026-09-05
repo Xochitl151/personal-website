@@ -1,18 +1,23 @@
 ---
 interface Props {
   steps: string[];
+  label?: string;
+  /** 需要强调的步骤下标（从 0 起） */
+  highlight?: number;
 }
 
-const { steps } = Astro.props;
+const { steps, label = '链路', highlight } = Astro.props;
 if (steps.length === 0) return null;
 ---
 
-<div class="pipeline reveal" aria-label="分析链路">
-  <span class="pipeline__label">链路</span>
+<div class="pipeline reveal" aria-label={label}>
+  <span class="pipeline__label">{label}</span>
   <ol class="pipeline__steps">
-    {steps.map((step) => (
-      <li>{step}</li>
-    ))}
+    {
+      steps.map((step, i) => (
+        <li class:list={[typeof highlight === 'number' && i === highlight && 'is-focus']}>{step}</li>
+      ))
+    }
   </ol>
 </div>
 
@@ -56,6 +61,11 @@ if (steps.length === 0) return null;
     animation: step-in 0.4s ease forwards;
   }
 
+  .pipeline__steps li.is-focus {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
   .pipeline__steps li:nth-child(1) {
     animation-delay: 0.05s;
   }
@@ -82,7 +92,7 @@ if (steps.length === 0) return null;
     font-weight: 400;
   }
 
-  .pipeline.is-visible .pipeline__steps li:last-child {
+  .pipeline.is-visible .pipeline__steps li:last-child:not(.is-focus) {
     color: var(--color-accent);
   }
 

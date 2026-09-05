@@ -20,7 +20,7 @@ const maxSearch = Math.max(...keywords.map((k) => k.search), 1);
   <div class="demo__board">
     <AnalysisBoard
       size="compact"
-      label="关键词分析 · 看板示意"
+      label="关键词分析 · 看板预览"
       variant="keywords"
     />
   </div>
@@ -177,60 +177,61 @@ const maxSearch = Math.max(...keywords.map((k) => k.search), 1);
     background: var(--color-bg);
   }
 
-  .kw-table-wrap {
+  /* :global：渠道切换 innerHTML 后节点仍吃到样式（避免绿条/火花条消失） */
+  .demo :global(.kw-table-wrap) {
     overflow-x: auto;
   }
 
-  .kw-table {
+  .demo :global(.kw-table) {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.875rem;
   }
 
-  .kw-table th,
-  .kw-table td {
+  .demo :global(.kw-table th),
+  .demo :global(.kw-table td) {
     padding: 0.55rem 0.65rem;
     text-align: left;
     border-bottom: 1px solid var(--color-border);
   }
 
-  .kw-table th {
+  .demo :global(.kw-table th) {
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--color-muted);
   }
 
-  .kw-table tbody tr {
+  .demo :global(.kw-table tbody tr) {
     opacity: 0;
     animation: row-in 0.35s ease forwards;
     animation-delay: calc(var(--i, 0) * 0.04s);
   }
 
-  .kw-table td:nth-child(n + 2) {
+  .demo :global(.kw-table td:nth-child(n + 2)) {
     font-variant-numeric: tabular-nums;
   }
 
-  .kw-table tr.is-low td:last-child {
+  .demo :global(.kw-table tr.is-low td:last-child) {
     color: #c47800;
     font-weight: 600;
   }
 
-  .kw-cell,
-  .kw-ctr {
+  .demo :global(.kw-cell),
+  .demo :global(.kw-ctr) {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
   }
 
-  .kw-spark,
-  .kw-ctr-bar {
+  .demo :global(.kw-spark),
+  .demo :global(.kw-ctr-bar) {
     display: inline-block;
     height: 0.35rem;
     border-radius: 999px;
     vertical-align: middle;
   }
 
-  .kw-spark {
+  .demo :global(.kw-spark) {
     width: 2.75rem;
     background: linear-gradient(
       90deg,
@@ -240,7 +241,7 @@ const maxSearch = Math.max(...keywords.map((k) => k.search), 1);
     );
   }
 
-  .kw-ctr-bar {
+  .demo :global(.kw-ctr-bar) {
     width: 2.4rem;
     background: linear-gradient(
       90deg,
@@ -250,7 +251,7 @@ const maxSearch = Math.max(...keywords.map((k) => k.search), 1);
     );
   }
 
-  .kw-table tr.is-low .kw-ctr-bar {
+  .demo :global(.kw-table tr.is-low .kw-ctr-bar) {
     background: linear-gradient(
       90deg,
       #fbbf24 0%,
@@ -279,7 +280,7 @@ const maxSearch = Math.max(...keywords.map((k) => k.search), 1);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .kw-table tbody tr {
+    .demo :global(.kw-table tbody tr) {
       opacity: 1;
       animation: none;
     }

@@ -2,13 +2,19 @@
 import { site } from '../site.config';
 
 const nav = [
-  { href: '/tour', label: '导览' },
-  { href: '/projects', label: '作品' },
-  { href: '/about', label: '关于' },
-  { href: '/resume', label: '简历' },
+  { href: '/#cases', label: '作品', match: 'works' as const },
+  { href: '/about', label: '关于', match: 'about' as const },
+  { href: '/resume', label: '简历', match: 'resume' as const },
 ];
 
 const current = Astro.url.pathname;
+
+function isActive(match: (typeof nav)[number]['match']) {
+  if (match === 'works') return current === '/' || current.startsWith('/projects/');
+  if (match === 'about') return current.startsWith('/about');
+  if (match === 'resume') return current.startsWith('/resume');
+  return false;
+}
 ---
 
 <header class="header">
@@ -16,15 +22,18 @@ const current = Astro.url.pathname;
     <a class="header__brand" href="/">{site.name}</a>
     <nav class="header__nav" aria-label="主导航">
       {
-        nav.map((item) => (
-          <a
-            class:list={['header__link', current.startsWith(item.href) && 'is-active']}
-            href={item.href}
-            aria-current={current.startsWith(item.href) ? 'page' : undefined}
-          >
-            {item.label}
-          </a>
-        ))
+        nav.map((item) => {
+          const active = isActive(item.match);
+          return (
+            <a
+              class:list={['header__link', active && 'is-active']}
+              href={item.href}
+              aria-current={active ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          );
+        })
       }
     </nav>
   </div>

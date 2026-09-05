@@ -1,28 +1,40 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { projectKinds, splitProjectTags } from '../lib/projects';
+import { projectKinds } from '../lib/projects';
 
 interface Props {
   project: CollectionEntry<'projects'>;
 }
 
 const { project } = Astro.props;
-const { title, takeaway, kind, tags } = project.data;
+const { title, takeaway, lookFor, kind, dateLabel, date } = project.data;
 const href = `/projects/${project.slug}`;
 const kindMeta = projectKinds[kind];
-const { skills } = splitProjectTags(tags);
-const skillTags = skills.slice(0, 3);
+const when =
+  dateLabel ||
+  date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'numeric',
+  });
 ---
 
 <article class="card" data-card-tilt>
   <a class="card__link" href={href}>
     <div class="card__meta">
       <span class:list={['tag', kindMeta.tagClass]}>{kindMeta.label}</span>
-      {skillTags.map((tag) => <span class="tag tag--skill">{tag}</span>)}
+      <time class="card__when" datetime={date.toISOString()}>{when}</time>
     </div>
     <h2 class="card__title">{title}</h2>
     <p class="card__takeaway">{takeaway}</p>
-    <span class="card__more">查看案例</span>
+    {
+      lookFor ? (
+        <p class="card__look">
+          <span class="card__look-label">看点</span>
+          {lookFor}
+        </p>
+      ) : null
+    }
+    <span class="card__more">打开案例</span>
   </a>
 </article>
 
@@ -31,7 +43,7 @@ const skillTags = skills.slice(0, 3);
     --tilt-x: 0deg;
     --tilt-y: 0deg;
     height: 100%;
-    background: rgb(255 255 255 / 90%);
+    background: rgb(255 255 255 / 92%);
     border: 1px solid var(--color-border);
     border-radius: calc(var(--radius) + 2px);
     box-shadow: 0 1px 2px rgb(28 25 23 / 3%), 0 10px 28px rgb(28 25 23 / 4%);
@@ -52,7 +64,7 @@ const skillTags = skills.slice(0, 3);
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 1.55rem 1.6rem 1.4rem;
+    padding: 1.45rem 1.5rem 1.35rem;
     color: inherit;
     text-decoration: none;
   }
@@ -64,16 +76,22 @@ const skillTags = skills.slice(0, 3);
   .card__meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-bottom: 0.9rem;
+    align-items: center;
+    gap: 0.45rem 0.7rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .card__when {
+    font-size: 0.82rem;
+    color: var(--color-muted);
   }
 
   .card__title {
-    margin: 0 0 0.65rem;
-    font-size: 1.22rem;
+    margin: 0 0 0.55rem;
+    font-size: 1.18rem;
     font-weight: 600;
-    letter-spacing: -0.028em;
-    line-height: 1.28;
+    letter-spacing: -0.025em;
+    line-height: 1.32;
     transition: color 0.2s ease;
   }
 
@@ -83,7 +101,7 @@ const skillTags = skills.slice(0, 3);
 
   .card__takeaway {
     flex: 1;
-    margin: 0 0 1.35rem;
+    margin: 0 0 0.85rem;
     font-size: 0.92rem;
     line-height: 1.65;
     color: var(--color-muted);
@@ -91,6 +109,25 @@ const skillTags = skills.slice(0, 3);
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .card__look {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.5rem;
+    margin: 0 0 1.2rem;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    color: var(--color-text);
+  }
+
+  .card__look-label {
+    flex-shrink: 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--color-accent);
   }
 
   .card__more {

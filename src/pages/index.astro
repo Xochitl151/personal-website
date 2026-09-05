@@ -1,14 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
-import SearchStage from '../components/SearchStage.astro';
+import AnalysisBoard from '../components/AnalysisBoard.astro';
 import { getCollection } from 'astro:content';
-import { pitches, site } from '../site.config';
+import { site } from '../site.config';
 
-const projects = (await getCollection('projects'))
-  .filter((p) => p.data.featured)
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 4);
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
 ---
 
 <BaseLayout title={site.title} description={site.description}>
@@ -16,21 +15,15 @@ const projects = (await getCollection('projects'))
     <div class="hero__atmosphere" aria-hidden="true"></div>
     <div class="container hero__grid">
       <div class="hero__copy">
-        <p class="hero__eyebrow">作品集 · 数据分析 / AI 产品</p>
+        <p class="hero__eyebrow">作品集 · 数据分析</p>
         <h1 class="hero__title">{site.name}</h1>
         <p class="hero__tagline">{site.tagline}</p>
         <p class="hero__support">{site.taglineSupport}</p>
         <div class="hero__actions">
-          <a class="btn" href="/tour">60 秒导览</a>
-          <a class="btn btn--ghost" href="/projects">全部作品</a>
+          <a class="btn" href="#cases">查看作品</a>
+          <a class="btn btn--ghost" href="/about">关于</a>
           <a class="btn btn--ghost" href="/resume">下载简历</a>
         </div>
-        <p class="hero__pitch">
-          按方向：
-          <a href={pitches.data.path}>{pitches.data.label}</a>
-          ·
-          <a href={pitches.ai.path}>{pitches.ai.label}</a>
-        </p>
       </div>
       <div class="hero__visual">
         <div class="hero__stage" aria-hidden="true">
@@ -43,7 +36,7 @@ const projects = (await getCollection('projects'))
             <span></span>
           </div>
           <div class="hero__stage-main">
-            <SearchStage />
+            <AnalysisBoard label="用户套餐 · 看板预览" variant="packages" />
           </div>
         </div>
       </div>
@@ -53,16 +46,18 @@ const projects = (await getCollection('projects'))
     </a>
   </section>
 
-  <section class="section" id="cases">
+  <section class="section cases" id="cases">
+    <div class="cases__atmosphere" aria-hidden="true"></div>
     <div class="container">
-      <div class="section__head reveal">
+      <header class="cases__head reveal">
+        <p class="cases__eyebrow">作品</p>
         <h2>项目案例</h2>
-        <a class="section__link" href="/projects">全部作品 →</a>
-      </div>
-      <div class="grid">
+        <p class="cases__lead">先看结论，再点开页内看板与证据。</p>
+      </header>
+      <div class="cases__grid">
         {
           projects.map((project, index) => (
-            <div class="reveal" style={`--reveal-delay: ${80 + index * 70}`}>
+            <div class="reveal cases__item" style={`--reveal-delay: ${80 + index * 70}`}>
               <ProjectCard project={project} />
             </div>
           ))
@@ -180,21 +175,6 @@ const projects = (await getCollection('projects'))
     display: flex;
     flex-wrap: wrap;
     gap: 0.65rem;
-  }
-
-  .hero__pitch {
-    margin: 1rem 0 0;
-    font-size: 0.88rem;
-    color: var(--color-muted);
-  }
-
-  .hero__pitch a {
-    font-weight: 500;
-    text-decoration: none;
-  }
-
-  .hero__pitch a:hover {
-    text-decoration: underline;
   }
 
   .hero__visual {
@@ -323,47 +303,66 @@ const projects = (await getCollection('projects'))
   }
 
   .section {
+    position: relative;
     padding-block: var(--space-section);
   }
 
-  .section__head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.6rem;
+  .cases {
+    overflow: hidden;
   }
 
-  .section__head h2 {
-    margin: 0;
+  .cases__atmosphere {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 12% 0%, rgb(45 212 191 / 12%), transparent 55%),
+      radial-gradient(ellipse 55% 40% at 90% 80%, rgb(13 148 136 / 8%), transparent 50%);
+    pointer-events: none;
+  }
+
+  .cases__head {
+    position: relative;
+    max-width: 34rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .cases__eyebrow {
+    margin: 0 0 0.55rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .cases__head h2 {
+    margin: 0 0 0.55rem;
     letter-spacing: -0.03em;
   }
 
-  .section__link {
-    font-size: 0.92rem;
-    font-weight: 500;
+  .cases__lead {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
     color: var(--color-muted);
-    text-decoration: none;
-    transition: color 0.15s ease;
   }
 
-  .section__link:hover {
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .grid {
+  .cases__grid {
+    position: relative;
     display: grid;
     gap: 1.1rem;
   }
 
-  .grid > .reveal {
+  .cases__item {
     height: 100%;
+    min-width: 0;
   }
 
-  @media (min-width: 640px) {
-    .grid {
-      grid-template-columns: repeat(2, 1fr);
+  @media (min-width: 800px) {
+    .cases__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.15rem;
+      align-items: stretch;
     }
   }
 

@@ -1,0 +1,284 @@
+---
+---
+
+<section class="demo reveal" data-demo="bidding-browse" aria-label="标讯样例检索">
+  <div class="demo__head">
+    <h2>标讯样例检索</h2>
+    <p class="demo__hint">公开公告样例 · 676 条 · 按来源 / 关键词过滤（联调库约 9000+ 见截图）</p>
+  </div>
+
+  <div class="demo__controls">
+    <label>
+      <span>网站来源</span>
+      <select data-bid-source>
+        <option value="">全部来源</option>
+      </select>
+    </label>
+    <label>
+      <span>关键词标签</span>
+      <select data-bid-keyword>
+        <option value="">全部关键词</option>
+      </select>
+    </label>
+    <label class="demo__controls-wide">
+      <span>标题检索</span>
+      <input type="search" data-bid-q placeholder="如：政务云、专线、广东" />
+    </label>
+  </div>
+
+  <p class="demo__count" data-bid-count>加载中…</p>
+
+  <div class="picker-table-wrap">
+    <table class="picker-table">
+      <thead>
+        <tr>
+          <th>标题</th>
+          <th>发布时间</th>
+          <th>来源</th>
+          <th>关键词</th>
+        </tr>
+      </thead>
+      <tbody data-bid-rows />
+    </table>
+  </div>
+</section>
+
+<script>
+  type Row = {
+    id: string;
+    title: string;
+    time: string;
+    source: string;
+    keyword: string;
+    url?: string;
+  };
+
+  const sourceSelect = document.querySelector<HTMLSelectElement>('[data-bid-source]');
+  const keywordSelect = document.querySelector<HTMLSelectElement>('[data-bid-keyword]');
+  const qInput = document.querySelector<HTMLInputElement>('[data-bid-q]');
+  const tbody = document.querySelector('[data-bid-rows]');
+  const countEl = document.querySelector('[data-bid-count]');
+  let rows: Row[] = [];
+  const MAX_SHOW = 40;
+
+  function fillSelect(select: HTMLSelectElement | null, values: string[], allLabel: string) {
+    if (!select) return;
+    const current = select.value;
+    select.innerHTML = `<option value="">${allLabel}</option>`;
+    for (const v of values) {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      select.appendChild(opt);
+    }
+    if ([...select.options].some((o) => o.value === current)) select.value = current;
+  }
+
+  function escapeHtml(s: string) {
+    return s
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+  }
+
+  function render() {
+    if (!tbody || !countEl) return;
+
+    const source = sourceSelect?.value ?? '';
+    const keyword = keywordSelect?.value ?? '';
+    const q = qInput?.value.trim().toLowerCase() ?? '';
+
+    const filtered = rows.filter((r) => {
+      if (source && r.source !== source) return false;
+      if (keyword && r.keyword !== keyword) return false;
+      if (q && !`${r.title}${r.keyword}${r.source}`.toLowerCase().includes(q)) return false;
+      return true;
+    });
+
+    const shown = filtered.slice(0, MAX_SHOW);
+    countEl.textContent =
+      filtered.length === 0
+        ? '无匹配公告，可放宽筛选条件。'
+        : `匹配 ${filtered.length} 条（样例共 ${rows.length} 条；下方展示前 ${shown.length} 条）。`;
+
+    tbody.innerHTML = shown
+      .map(
+        (r) => `
+      <tr>
+        <td><strong>${escapeHtml(r.title)}</strong></td>
+        <td>${escapeHtml(r.time)}</td>
+        <td>${escapeHtml(r.source)}</td>
+        <td><span class="bid-tag">${escapeHtml(r.keyword)}</span></td>
+      </tr>`,
+      )
+      .join('');
+  }
+
+  fetch('/data/bidding-announcements.json')
+    .then((r) => r.json())
+    .then((data: Row[]) => {
+      rows = data;
+      const sources = [...new Set(rows.map((r) => r.source).filter(Boolean))].sort();
+      const keywords = [...new Set(rows.map((r) => r.keyword).filter(Boolean))].sort();
+      fillSelect(sourceSelect, sources, '全部来源');
+      fillSelect(keywordSelect, keywords, '全部关键词');
+      render();
+    })
+    .catch(() => {
+      if (countEl) countEl.textContent = '样例数据加载失败。';
+    });
+
+  sourceSelect?.addEventListener('change', render);
+  keywordSelect?.addEventListener('change', render);
+  qInput?.addEventListener('input', render);
+</script>
+
+<style>
+  .demo {
+    margin-bottom: 2.5rem;
+    padding: 1.35rem;
+    background: var(--color-surface);
+    border: none;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .demo__head h2 {
+    margin: 0 0 0.25rem;
+    font-size: 1.1rem;
+    border: none;
+    padding: 0;
+  }
+
+  .demo__hint {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+  }
+
+  .demo__controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .demo__controls {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    .demo__controls-wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .demo__controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-muted);
+  }
+
+  .demo__controls select,
+  .demo__controls input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg);
+  }
+
+  .demo__controls select:focus,
+  .demo__controls input:focus {
+    outline: none;
+    border-color: #99f6e4;
+    box-shadow: 0 0 0 3px rgb(15 118 110 / 8%);
+  }
+
+  .demo__count {
+    margin: 0 0 0.85rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-accent);
+  }
+
+  .picker-table-wrap {
+    overflow-x: auto;
+    max-height: 28rem;
+  }
+
+  .picker-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  .picker-table th,
+  .picker-table td {
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .picker-table th:nth-child(1),
+  .picker-table td:nth-child(1) {
+    width: 48%;
+    padding-left: 0;
+  }
+
+  .picker-table th:nth-child(2),
+  .picker-table td:nth-child(2) {
+    width: 16%;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    color: var(--color-muted);
+  }
+
+  .picker-table th:nth-child(3),
+  .picker-table td:nth-child(3) {
+    width: 22%;
+  }
+
+  .picker-table th:nth-child(4),
+  .picker-table td:nth-child(4) {
+    width: 14%;
+    padding-right: 0;
+  }
+
+  .picker-table th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  .picker-table tbody tr:hover td {
+    background: rgb(240 253 250 / 40%);
+  }
+
+  .picker-table td strong {
+    display: block;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .bid-tag {
+    display: inline-block;
+    padding: 0.15rem 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #134e4a;
+    background: #ccfbf1;
+    border-radius: 999px;
+  }
+</style>

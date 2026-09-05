@@ -32,9 +32,9 @@ const lensSchema = z.object({
 });
 
 const demoSchema = z.enum([
-  'funnel',
   'product-picker',
   'bidding-insights',
+  'bidding-browse',
   'user-insights',
   'chart-gallery',
   'feature-explorer',
@@ -48,19 +48,27 @@ const projects = defineCollection({
     summary: z.string(),
     /** 首屏结论条：一句话 + 尽量带结果导向 */
     takeaway: z.string(),
+    /** 卡片上的「看点」：打开后优先点哪里 */
+    lookFor: z.string().optional(),
     /** 关键指标（可后补真实数字） */
     metrics: z.array(metricSchema).default([]),
     /** 我的角色一句话 */
     role: z.string(),
     date: z.coerce.date(),
+    /** 展示用时段，如 2025.08 – 2025.12；缺省则用 date 年月 */
+    dateLabel: z.string().optional(),
     tags: z.array(z.string()).default([]),
     kind: z.enum(['intern', 'independent', 'contest', 'side']),
     featured: z.boolean().default(false),
     order: z.number().default(0),
     /** 页脚说明，如公开数据来源 */
     disclaimer: z.string().optional(),
-    /** 分析链路（静态步骤条） */
+    /** 链路步骤（静态步骤条） */
     pipeline: z.array(z.string()).default([]),
+    /** 链路左侧小标题，默认「链路」 */
+    pipelineLabel: z.string().optional(),
+    /** 需要强调的步骤下标（从 0 起） */
+    pipelineHighlight: z.number().int().min(0).optional(),
     /** 核心发现卡片 */
     findings: z.array(findingSchema).default([]),
     /** 页内交互 Demo */

@@ -1,6 +1,6 @@
 ---
 interface Props {
-  /** hero：首页大示意；compact：项目页/导览 */
+  /** hero：首页大示意；compact：项目页 */
   size?: 'hero' | 'compact';
   label?: string;
   query?: string;
@@ -9,7 +9,7 @@ interface Props {
 
 const {
   size = 'hero',
-  label = '招投标搜索 · 示意',
+  label = '招投标搜索 · 界面预览',
   query = '电子招投标',
   chips = ['时间', '地区', '类型'],
 } = Astro.props;

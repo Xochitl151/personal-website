@@ -18,7 +18,7 @@ const avgStay =
   </div>
 
   <div class="demo__board">
-    <AnalysisBoard size="compact" label="用户结构 · 看板示意" variant="keywords" />
+    <AnalysisBoard size="compact" label="用户结构 · 看板预览" variant="packages" />
   </div>
 
   <div class="demo__controls">
@@ -121,7 +121,7 @@ const avgStay =
   </div>
 
   <p class="demo__insight" data-user-insight>
-    各套餐在网率均值约 {avgStay}%。低于均值的合同类型标黄（公开集上月付流失更高，属观察性结论）。
+    各套餐在网率均值约 {avgStay}%。低于均值的合同类型标黄（公开数据上月付流失更高，属观察性结论）。
   </p>
 </section>
 
@@ -142,8 +142,8 @@ const avgStay =
     if (insight) {
       insight.textContent =
         view === 'package'
-          ? `各套餐在网率均值约 ${avgStay}%。低于均值的合同类型标黄（公开集上月付流失更高，属观察性结论）。`
-          : `按互联网业务类型看用户规模与在网率；公开集无中国地区字段，地区结构以实习内网为准。`;
+          ? `各套餐在网率均值约 ${avgStay}%。低于均值的合同类型标黄（公开数据上月付流失更高，属观察性结论）。`
+          : `按互联网业务类型看用户规模与在网率。`;
     }
   });
 </script>
