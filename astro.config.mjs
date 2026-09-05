@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://personal-website-8ja.pages.dev',
+  site: 'https://xuhf.pages.dev',
   trailingSlash: 'never',
   redirects: {
     '/pitch/ai': '/',
